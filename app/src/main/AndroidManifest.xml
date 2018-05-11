@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".toolbar.GroupView"></activity>
+        <activity android:name=".toolbar.GroupViewActivity"></activity>
     </application>
 
 </manifest>

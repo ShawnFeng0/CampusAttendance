@@ -9,7 +9,7 @@ public class Face extends DataSupport{
     private GroupDB groupDB;
     private String studentName;
     private String studentID;
-    private AFR_FSDKFace FaceList;
+    private byte[] featureData;
 
     public String getStudentID() {
         return studentID;
@@ -17,14 +17,6 @@ public class Face extends DataSupport{
 
     public void setStudentID(String studentID) {
         this.studentID = studentID;
-    }
-
-    public AFR_FSDKFace getFaceList() {
-        return FaceList;
-    }
-
-    public void setFaceList(AFR_FSDKFace faceList) {
-        FaceList = faceList;
     }
 
     public String getStudentName() {
@@ -42,4 +34,13 @@ public class Face extends DataSupport{
     public void setId(int id) {
         this.id = id;
     }
+
+    public byte[] getFeatureData() {
+        return featureData;
+    }
+
+    public void setFeatureData(byte[] featureData) {
+        this.featureData = featureData;
+    }
+
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <litepal>
-    <dbname value="Face" ></dbname>
+    <dbname value="Face" />
 
-    <version value="3" ></version>
+    <version value="4" />
 
     <list>
         <mapping class="com.example.fengs.campusattendance.database.GroupDB" />

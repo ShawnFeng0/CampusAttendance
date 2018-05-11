@@ -10,10 +10,10 @@ public class GroupDB extends DataSupport {
     private int id;
     private String groupID;
     private String groupName;
-    private List<Face> studentsGroup;
+    private List<Face> faces;
 
     public GroupDB(){
-        studentsGroup = new ArrayList<>();
+        faces = new ArrayList<>();
     }
 
     public String getGroupID() {
@@ -32,12 +32,8 @@ public class GroupDB extends DataSupport {
         this.groupName = groupName;
     }
 
-    public List<Face> getStudentsGroup() {
-        return studentsGroup;
-    }
-
-    public void setStudentsGroup(List<Face> studentsGroup) {
-        this.studentsGroup = studentsGroup;
+    public List<Face> getFaces() {
+        return DataSupport.where("groupdb_id = ?", String.valueOf(id)).find(Face.class);
     }
 
     public int getId() {

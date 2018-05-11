@@ -13,11 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.fengs.campusattendance.database.Face;
 import com.example.fengs.campusattendance.database.GroupDB;
-import com.example.fengs.campusattendance.toolbar.GroupView;
+import com.example.fengs.campusattendance.toolbar.GroupViewActivity;
 
-import java.util.List;
+import org.litepal.crud.DataSupport;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.view_group:
-                Intent intent = new Intent(MainActivity.this, GroupView.class);
+                Intent intent = new Intent(MainActivity.this, GroupViewActivity.class);
                 startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
@@ -78,7 +77,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             }
             case R.id.button_addData: {
-                for (int i = 1; i < 10; i++) {
+//                for (int i = 1; i < 10; i++) {
+                    GroupDB groupDB = DataSupport.findFirst(GroupDB.class);
+                    groupDB.setGroupID("1111111");
+                    groupDB.save();
 //                    final String groupID = "142027";
 //                    final String groupName = "通信工程";
 //                    GroupDB group = new GroupDB();
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 ////                    face_temp.save();
 ////                    group.getStudentsGroup().add(face_temp);
 //                    group.save();
-                }
+//                }
 
                 Toast.makeText(this, "You clicked group database", Toast.LENGTH_SHORT).show();
             }
