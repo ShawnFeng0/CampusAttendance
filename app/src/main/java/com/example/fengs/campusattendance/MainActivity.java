@@ -1,6 +1,5 @@
 package com.example.fengs.campusattendance;
 
-import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,7 +13,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.fengs.campusattendance.database.GroupDB;
-import com.example.fengs.campusattendance.toolbar.GroupViewActivity;
+import com.example.fengs.campusattendance.DataView.GroupViewActivity;
 
 import org.litepal.crud.DataSupport;
 
@@ -78,9 +77,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             case R.id.button_addData: {
 //                for (int i = 1; i < 10; i++) {
-                    GroupDB groupDB = DataSupport.findFirst(GroupDB.class);
-                    groupDB.setGroupID("1111111");
-                    groupDB.save();
 //                    final String groupID = "142027";
 //                    final String groupName = "通信工程";
 //                    GroupDB group = new GroupDB();
