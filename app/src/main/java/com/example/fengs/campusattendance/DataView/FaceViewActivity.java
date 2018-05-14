@@ -1,6 +1,7 @@
-package com.example.fengs.campusattendance;
+package com.example.fengs.campusattendance.DataView;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,31 +11,38 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.arcsoft.facedetection.AFD_FSDKFace;
 import com.arcsoft.facerecognition.AFR_FSDKFace;
-import com.example.fengs.campusattendance.DataView.FaceAdapter;
+import com.example.fengs.campusattendance.Bmp2YUV;
+import com.example.fengs.campusattendance.FaceRecognition;
+import com.example.fengs.campusattendance.R;
 import com.example.fengs.campusattendance.database.Face;
+import com.example.fengs.campusattendance.database.GroupDB;
 
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.util.List;
 
-public class RegisterActivity extends AppCompatActivity {
+public class FaceViewActivity extends AppCompatActivity {
 
     private Bitmap bitmap;
     private Bitmap mutableBitmap;
+    private GroupDB groupDB;
     private List<Face> faceList;
     private RecyclerView recyclerView;
     private ImageView bigImageView;
@@ -48,7 +56,10 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_resgister);
+        setContentView(R.layout.activity_face_view);
+
+        int group_id = getIntent().getIntExtra("groupID", 0);
+        groupDB = DataSupport.find(GroupDB.class, group_id);
 
         bigImageView = findViewById(R.id.face_big_image_view);
         recyclerView = findViewById(R.id.face_recycler_view);
@@ -98,16 +109,44 @@ public class RegisterActivity extends AppCompatActivity {
 
                 AFR_FSDKFace faceFeature = FaceRecognition.getFaceFeature(bitmap_data, bitmap.getWidth(), bitmap.getHeight(), faceRect);
 
-
+                LayoutInflater inflater = getLayoutInflater();
+                final View layout = inflater.inflate(R.layout.dialog_add_face, null);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(FaceViewActivity.this);
+                dialog.setTitle("添加新组");
+                dialog.setView(layout);
+                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText faceIDtext = layout.findViewById(R.id.edit_view_faceID);
+                        EditText faceName = layout.findViewById(R.id.edit_view_face_name);
+                        Face face = new Face();
+                        face.setFaceID(faceIDtext.getText().toString());
+                        face.setFaceName(faceName.getText().toString());
+                        face.setFaceImage(getFaceImage(bitmap, rect));
+                        face.setFeatureData(faceFeature.getFeatureData());
+                        face.save();
+                        groupDB.getFaces().add(face);
+                        groupDB.save();
+                        recycleViewUpdate(); //更新分组列表
+                        dialog.dismiss();
+                    }
+                });
+                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
 
                 Face face = new Face();
                 face.setFaceImage(getFaceImage(bitmap, rect));
                 face.setFeatureData(faceFeature.getFeatureData());
-                face
+//                face
 
 
             } else {
-                Toast.makeText(RegisterActivity.this, "没有检测到人脸，请换一张图片", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FaceViewActivity.this, "没有检测到人脸，请换一张图片", Toast.LENGTH_SHORT).show();
             }
             bigImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
             bigImageView.setImageBitmap(mutableBitmap);
@@ -115,7 +154,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void recycleViewUpdate() {
-        faceList = DataSupport.findAll(Face.class);
+        faceList = groupDB.getFaces();
         final FaceAdapter adapter = new FaceAdapter(faceList);
         recyclerView.setAdapter(adapter);
     }

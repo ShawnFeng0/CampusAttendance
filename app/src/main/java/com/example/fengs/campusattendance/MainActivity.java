@@ -12,10 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.fengs.campusattendance.database.GroupDB;
+import com.example.fengs.campusattendance.DataView.FaceViewActivity;
 import com.example.fengs.campusattendance.DataView.GroupViewActivity;
-
-import org.litepal.crud.DataSupport;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_IMAGE_CAMERA && resultCode == RESULT_OK) {
-            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            Intent intent = new Intent(MainActivity.this, FaceViewActivity.class);
             intent.putExtra("imageUri", imageFileUri);
             startActivityForResult(intent, REQUEST_CODE_REGISTER);
         }
@@ -83,8 +81,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                    group.setGroupID(groupID + String.valueOf(i));
 //                    group.setGroupName(groupName + String.valueOf(i));
 ////                    Face face_temp = new Face();
-////                    face_temp.setStudentID("142027339");
-////                    face_temp.setStudentName();
+////                    face_temp.setFaceID("142027339");
+////                    face_temp.setFaceName();
 ////                    face_temp.save();
 ////                    group.getStudentsGroup().add(face_temp);
 //                    group.save();

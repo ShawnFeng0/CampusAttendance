@@ -1,10 +1,8 @@
 package com.example.fengs.campusattendance.DataView;
 
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,7 +15,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.fengs.campusattendance.R;
-import com.example.fengs.campusattendance.RegisterActivity;
 import com.example.fengs.campusattendance.database.GroupDB;
 
 import org.litepal.crud.DataSupport;
@@ -93,7 +90,7 @@ public class GroupViewActivity extends AppCompatActivity {
     }
 
     public void faceView(GroupDB groupDB) {
-        Intent intent = new Intent(GroupViewActivity.this, RegisterActivity.class);
+        Intent intent = new Intent(GroupViewActivity.this, FaceViewActivity.class);
         intent.putExtra("groupID", groupDB.getId());
         startActivityForResult(intent, REQUEST_CODE_REGISTER);
     }

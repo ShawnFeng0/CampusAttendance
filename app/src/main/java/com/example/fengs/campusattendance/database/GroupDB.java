@@ -33,7 +33,12 @@ public class GroupDB extends DataSupport {
     }
 
     public List<Face> getFaces() {
-        return DataSupport.where("groupdb_id = ?", String.valueOf(id)).find(Face.class);
+        List<Face> faceList = DataSupport.where("groupdb_id = ?", String.valueOf(id)).find(Face.class);
+        if (faceList.size() != 0) {
+            return faces = faceList;
+        } else {
+            return faces;
+        }
     }
 
     public int getId() {

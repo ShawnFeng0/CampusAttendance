@@ -50,7 +50,7 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
                 int position = viewHolder.getAdapterPosition();
                 Face face = faceList.get(position);
                 Toast.makeText(v.getContext(), " you click view "
-                        + face.getStudentName(), Toast.LENGTH_SHORT).show();
+                        + face.getFaceName(), Toast.LENGTH_SHORT).show();
             }
         });
         viewHolder.faceView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -59,7 +59,7 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
                 final int position = viewHolder.getAdapterPosition();
                 final Face face = faceList.get(position);
                 AlertDialog.Builder dialog = new AlertDialog.Builder(v.getContext());
-                dialog.setMessage("确认删除：" + face.getStudentName());
+                dialog.setMessage("确认删除：" + face.getFaceName());
                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -84,7 +84,7 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Face face = faceList.get(position);
-        holder.faceName.setText(face.getStudentName());
+        holder.faceName.setText(face.getFaceName());
     }
 
     @Override

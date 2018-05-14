@@ -10,8 +10,8 @@ import java.io.ByteArrayOutputStream;
 public class Face extends DataSupport{
     private int id;
     private GroupDB groupDB;
-    private String studentName;
-    private String studentID;
+    private String faceName;
+    private String faceID;
     private byte[] featureData;
     private byte[] faceImageData;
 
@@ -23,20 +23,20 @@ public class Face extends DataSupport{
         this.faceImageData = faceImageData;
     }
 
-    public String getStudentID() {
-        return studentID;
+    public String getFaceID() {
+        return faceID;
     }
 
-    public void setStudentID(String studentID) {
-        this.studentID = studentID;
+    public void setFaceID(String faceID) {
+        this.faceID = faceID;
     }
 
-    public String getStudentName() {
-        return studentName;
+    public String getFaceName() {
+        return faceName;
     }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setFaceName(String faceName) {
+        this.faceName = faceName;
     }
 
     public int getId() {
