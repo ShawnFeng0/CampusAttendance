@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.fengs.campusattendance.R;
 import com.example.fengs.campusattendance.database.GroupDB;
@@ -38,7 +39,7 @@ public class GroupViewActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        recycleViewUpdate(); //更新分组列表
+        recyclerViewUpdate(); //更新分组列表
 
         Button back_button = findViewById(R.id.group_back_button);
         back_button.setOnClickListener(new View.OnClickListener() {
@@ -54,44 +55,56 @@ public class GroupViewActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LayoutInflater inflater = getLayoutInflater();
                 final View layout = inflater.inflate(R.layout.dialog_add_group, null);
-                AlertDialog.Builder dialog = new AlertDialog.Builder(GroupViewActivity.this);
-                dialog.setTitle("添加新组");
-                dialog.setView(layout);
-                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EditText groupIDtext = layout.findViewById(R.id.edit_view_groupID);
-                        EditText groupName = layout.findViewById(R.id.edit_view_group_name);
+                AlertDialog dialog = new AlertDialog.Builder(GroupViewActivity.this)
+                        .setTitle("添加新组")
+                        .setView(layout)
+                        .setPositiveButton("确定", null)
+                        .setNegativeButton("取消",null)
+                        .show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v1 -> {
+                    EditText groupIDtext = layout.findViewById(R.id.edit_view_groupID);
+                    EditText groupName = layout.findViewById(R.id.edit_view_group_name);
+                    if (!groupIDtext.getText().toString().isEmpty() && !groupName.getText().toString().isEmpty()) {
                         GroupDB groupDB = new GroupDB();
                         groupDB.setGroupID(groupIDtext.getText().toString());
                         groupDB.setGroupName(groupName.getText().toString());
                         groupDB.save();
-                        recycleViewUpdate(); //更新分组列表
+                        recyclerViewUpdate(); //更新分组列表
                         dialog.dismiss();
+                    } else {
+                        Toast.makeText(GroupViewActivity.this, "请输入相关信息", Toast.LENGTH_SHORT).show();
                     }
                 });
-                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v1 -> {
                         dialog.dismiss();
-                    }
                 });
-                dialog.show();
             }
         });
     }
 
 
-
-    private void recycleViewUpdate() {
+    /**
+     * 更新数据列表
+     */
+    private void recyclerViewUpdate() {
         groupDBList = DataSupport.findAll(GroupDB.class);
         final GroupAdapter adapter = new GroupAdapter(groupDBList);
         recyclerView.setAdapter(adapter);
     }
 
+    /**
+     * 进入人脸显示界面, 传入group的数据库ID
+     * @param groupDB
+     */
     public void faceView(GroupDB groupDB) {
         Intent intent = new Intent(GroupViewActivity.this, FaceViewActivity.class);
         intent.putExtra("groupID", groupDB.getId());
         startActivityForResult(intent, REQUEST_CODE_REGISTER);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        recyclerViewUpdate();
     }
 }

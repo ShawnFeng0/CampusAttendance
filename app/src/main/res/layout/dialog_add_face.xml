@@ -6,39 +6,47 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="40dp"
         android:layout_marginEnd="25dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="70dp"
             android:text="学号: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textAlignment="viewEnd" />
 
         <EditText
             android:id="@+id/edit_view_faceID"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="1420XXXXX" />
+            android:hint="如:1420XXXXX"
+            android:maxLength="10"
+            android:singleLine="true" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="40dp"
         android:layout_marginEnd="25dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="70dp"
             android:text="姓名: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textAlignment="viewEnd" />
 
         <EditText
             android:id="@+id/edit_view_face_name"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="张三" />
+            android:hint="如:张三"
+            android:maxLength="10"
+            android:singleLine="true" />
     </LinearLayout>
 
 </LinearLayout>

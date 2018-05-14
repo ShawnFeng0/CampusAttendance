@@ -48,9 +48,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             public void onClick(View v) {
                 int position = viewHolder.getAdapterPosition();
                 GroupDB groupDB = groupDBList.get(position);
-                Toast.makeText(v.getContext(), " you click group "
-                + groupDB.getId(), Toast.LENGTH_SHORT).show();
-                ((GroupViewActivity)(parent.getContext())).faceView(groupDB);
+                ((GroupViewActivity)(parent.getContext())).faceView(groupDB); //进入人脸界面
             }
         });
         viewHolder.groupView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -84,7 +82,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GroupDB groupDB = groupDBList.get(position);
-        holder.groupName.setText(groupDB.getGroupID() + "_" + groupDB.getGroupName());
+        holder.groupName.setText(groupDB.getGroupID() + ":" + groupDB.getGroupName());
         holder.groupCount.setText("人数: " + groupDB.getFaces().size());
     }
 

@@ -6,39 +6,47 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="40dp"
         android:layout_marginEnd="25dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
-            android:text="班级: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="课程: "
+            android:textAlignment="viewEnd" />
 
         <EditText
             android:id="@+id/edit_view_groupID"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="1420273" />
+            android:hint="如:信号与系统"
+            android:maxLength="10"
+            android:singleLine="true" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="40dp"
         android:layout_marginEnd="25dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
-            android:text="专业: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:text="班级/专业: "
+            android:textAlignment="viewEnd" />
 
         <EditText
             android:id="@+id/edit_view_group_name"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="通信工程" />
+            android:hint="142027X"
+            android:maxLength="10"
+            android:singleLine="true" />
     </LinearLayout>
 
 </LinearLayout>

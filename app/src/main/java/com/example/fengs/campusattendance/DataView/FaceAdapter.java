@@ -34,7 +34,7 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
         }
     }
 
-    public FaceAdapter(List<Face> faceDBLt) {
+    FaceAdapter(List<Face> faceDBLt) {
         faceList = faceDBLt;
     }
 
@@ -44,39 +44,32 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.face_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.faceView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = viewHolder.getAdapterPosition();
-                Face face = faceList.get(position);
-                Toast.makeText(v.getContext(), " you click view "
-                        + face.getFaceName(), Toast.LENGTH_SHORT).show();
-            }
+
+        /* 短按大图显示 */
+        viewHolder.faceView.setOnClickListener(v -> {
+            int position = viewHolder.getAdapterPosition();
+            Face face = faceList.get(position);
+            ((FaceViewActivity)(parent.getContext())).setBigImageView(face.getFaceImage());
         });
-        viewHolder.faceView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                final int position = viewHolder.getAdapterPosition();
-                final Face face = faceList.get(position);
-                AlertDialog.Builder dialog = new AlertDialog.Builder(v.getContext());
-                dialog.setMessage("确认删除：" + face.getFaceName());
-                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        removeData(position);
-                        dialog.dismiss();
-                    }
-                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
 
-                return true;
-            }
+        /* 长按删除 */
+        viewHolder.faceView.setOnLongClickListener(v -> {
+            final int position = viewHolder.getAdapterPosition();
+            final Face face = faceList.get(position);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(v.getContext());
+            dialog.setMessage("确认删除：" + face.getFaceName());
+            dialog.setPositiveButton("确定", (dialog12, which) -> {
+                removeData(position);
+                if (faceList.size() != 0) {
+                    ((FaceViewActivity) (parent.getContext())).setBigImageView(faceList.get(position == faceList.size() ? position - 1 : position).getFaceImage());
+                } else {
+                    ((FaceViewActivity)(parent.getContext())).setBigImageView(R.drawable.add_photos);
+                }
+                dialog12.dismiss();
+            }).setNegativeButton("取消", (dialog1, which) -> dialog1.dismiss());
+            dialog.show();
 
+            return true;
         });
         return viewHolder;
     }
