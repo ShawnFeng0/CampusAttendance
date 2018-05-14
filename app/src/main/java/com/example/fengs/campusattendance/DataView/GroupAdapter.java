@@ -22,16 +22,18 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView groupName;
+        TextView groupCount;
         View groupView;
 
         ViewHolder(View view) {
             super(view);
             groupView = view;
             groupName = view.findViewById(R.id.group_name);
+            groupCount = view.findViewById(R.id.group_count);
         }
     }
 
-    public GroupAdapter(List<GroupDB> gDBLt) {
+    GroupAdapter(List<GroupDB> gDBLt) {
         groupDBList = gDBLt;
     }
 
@@ -83,6 +85,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GroupDB groupDB = groupDBList.get(position);
         holder.groupName.setText(groupDB.getGroupID() + "_" + groupDB.getGroupName());
+        holder.groupCount.setText("人数: " + groupDB.getFaces().size());
     }
 
     @Override
