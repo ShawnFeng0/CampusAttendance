@@ -3,6 +3,7 @@ package com.example.fengs.campusattendance.DataView;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -64,6 +65,7 @@ public class FaceViewActivity extends AppCompatActivity {
         bigImageView = findViewById(R.id.face_big_image_view);
         recyclerView = findViewById(R.id.face_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
 
@@ -71,7 +73,6 @@ public class FaceViewActivity extends AppCompatActivity {
         back_button.setOnClickListener(v -> finish());
         Button add_button = findViewById(R.id.face_add_button);
         add_button.setOnClickListener(v -> imageCapture());
-        bigImageView.setOnClickListener(v -> imageCapture());
 
     }
 
@@ -127,6 +128,8 @@ public class FaceViewActivity extends AppCompatActivity {
                         face.save();
                         groupDB.getFaces().add(face);
                         groupDB.save();
+                        Toast.makeText(FaceViewActivity.this, "group "
+                                + groupDB.getId(), Toast.LENGTH_SHORT).show();
                         recycleViewUpdate(); //更新分组列表
                         dialog.dismiss();
                     }
@@ -138,12 +141,6 @@ public class FaceViewActivity extends AppCompatActivity {
                     }
                 });
                 dialog.show();
-
-                Face face = new Face();
-                face.setFaceImage(getFaceImage(bitmap, rect));
-                face.setFeatureData(faceFeature.getFeatureData());
-//                face
-
 
             } else {
                 Toast.makeText(FaceViewActivity.this, "没有检测到人脸，请换一张图片", Toast.LENGTH_SHORT).show();
@@ -157,6 +154,23 @@ public class FaceViewActivity extends AppCompatActivity {
         faceList = groupDB.getFaces();
         final FaceAdapter adapter = new FaceAdapter(faceList);
         recyclerView.setAdapter(adapter);
+        if (faceList.size() == 0) {
+            bigImageView.setOnClickListener(v -> imageCapture());
+        } else {
+            bigImageView.setOnClickListener(v -> {});
+        }
+    }
+
+    private void setBigImageView(Bitmap bitmap) {
+        bigImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        bigImageView.setImageBitmap(mutableBitmap);
+        bigImageView.setOnClickListener(v -> {});
+    }
+
+    private void setBigImageView(int resId) {
+        bigImageView.setScaleType(ImageView.ScaleType.CENTER);
+        bigImageView.setImageResource(resId);
+        bigImageView.setOnClickListener(v -> imageCapture());
     }
 
     /**

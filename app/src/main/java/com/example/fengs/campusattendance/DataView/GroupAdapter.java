@@ -48,8 +48,8 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             public void onClick(View v) {
                 int position = viewHolder.getAdapterPosition();
                 GroupDB groupDB = groupDBList.get(position);
-                Toast.makeText(v.getContext(), " you click view "
-                + groupDB.getGroupID(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), " you click group "
+                + groupDB.getId(), Toast.LENGTH_SHORT).show();
                 ((GroupViewActivity)(parent.getContext())).faceView(groupDB);
             }
         });

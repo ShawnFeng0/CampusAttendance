@@ -85,6 +85,7 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Face face = faceList.get(position);
         holder.faceName.setText(face.getFaceName());
+        holder.faceImageView.setImageBitmap(face.getFaceImage());
     }
 
     @Override
