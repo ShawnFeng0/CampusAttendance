@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="30dp"
         android:layout_marginEnd="25dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="30dp"
         android:layout_marginEnd="25dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -47,6 +47,31 @@
             android:hint="142027X"
             android:maxLength="10"
             android:singleLine="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/add_photos" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="添加书籍照片"
+            android:textAlignment="center" />
+
     </LinearLayout>
 
 </LinearLayout>

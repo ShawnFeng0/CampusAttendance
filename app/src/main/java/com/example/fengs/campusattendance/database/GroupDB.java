@@ -41,6 +41,10 @@ public class GroupDB extends DataSupport {
         }
     }
 
+    public String toString() {
+        return this.getGroupID() + ":" + this.getGroupName();
+    }
+
     public int getId() {
         return id;
     }

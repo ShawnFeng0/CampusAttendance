@@ -9,29 +9,50 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.fengs.campusattendance.DataView.FaceViewActivity;
 import com.example.fengs.campusattendance.DataView.GroupViewActivity;
+import com.example.fengs.campusattendance.database.GroupDB;
+
+import org.litepal.crud.DataSupport;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final int REQUEST_CODE_IMAGE_CAMERA = 1;
     private static final int REQUEST_CODE_REGISTER = 2;
+    private Spinner groupSpinner;
+    private List<GroupDB> groupDBList;
     private Uri imageFileUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.toolbar));
-        Button button = this.findViewById(R.id.button_register);
-        button.setOnClickListener(this);
-        button = this.findViewById(R.id.button_recognition);
-        button.setOnClickListener(this);
-        button = this.findViewById(R.id.button_addData);
-        button.setOnClickListener(this);
+        setSupportActionBar(findViewById(R.id.toolbar));
+
+        groupSpinner = findViewById(R.id.group_select_spinner);
+
+        groupDBList = DataSupport.findAll(GroupDB.class);
+
+        ArrayAdapter<GroupDB> arrayAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, groupDBList);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        groupSpinner.setAdapter(arrayAdapter);
+
+//        Button button = this.findViewById(R.id.button_register);
+//        button.setOnClickListener(this);
+//        button = this.findViewById(R.id.button_recognition);
+//        button.setOnClickListener(this);
+//        button = this.findViewById(R.id.button_addData);
+//        button.setOnClickListener(this);
     }
 
     @Override
@@ -64,15 +85,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.button_register: {
-                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                ContentValues values = new ContentValues(1);
-                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                imageFileUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
-                startActivityForResult(intent, REQUEST_CODE_IMAGE_CAMERA);
-                break;
-            }
             case R.id.button_addData: {
 //                for (int i = 1; i < 10; i++) {
 //                    final String groupID = "142027";

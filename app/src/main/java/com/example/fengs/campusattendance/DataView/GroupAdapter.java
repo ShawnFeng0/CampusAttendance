@@ -82,7 +82,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         GroupDB groupDB = groupDBList.get(position);
-        holder.groupName.setText(groupDB.getGroupID() + ":" + groupDB.getGroupName());
+        holder.groupName.setText(groupDB.toString());
         holder.groupCount.setText("人数: " + groupDB.getFaces().size());
     }
 
