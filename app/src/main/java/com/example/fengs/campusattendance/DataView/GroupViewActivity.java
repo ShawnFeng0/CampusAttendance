@@ -17,7 +17,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.fengs.campusattendance.Bmp2YUV;
@@ -86,11 +89,13 @@ public class GroupViewActivity extends AppCompatActivity {
                         .setPositiveButton("确定", null)
                         .setNegativeButton("取消",null)
                         .show();
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v1 -> {
-                    if (!dialogGroupIDtext.getText().toString().isEmpty() && !dialogGroupName.getText().toString().isEmpty()) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((View v1) -> {
+                    if (!dialogGroupIDtext.getText().toString().isEmpty()
+                            && !dialogGroupName.getText().toString().isEmpty()) {
                         GroupDB groupDB = new GroupDB();
                         groupDB.setGroupID(dialogGroupIDtext.getText().toString());
                         groupDB.setGroupName(dialogGroupName.getText().toString());
+                        groupDB.setGroupImage(groupImageBitmap);
                         groupDB.save();
                         recyclerViewUpdate(); //更新分组列表
                         dialog.dismiss();
@@ -116,8 +121,12 @@ public class GroupViewActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            groupImageBitmap = getZoomBitmap(groupImageBitmap, 300, 600);
+            groupImageBitmap = getZoomBitmap(groupImageBitmap, 450, 600);
             dialogGroupImageButton.setImageBitmap(groupImageBitmap);
+            dialogGroupImageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            FrameLayout.LayoutParams param = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+            dialogGroupImageButton.setLayoutParams(param);
         }
     }
 
@@ -138,8 +147,8 @@ public class GroupViewActivity extends AppCompatActivity {
      * @return
      */
     private Bitmap getZoomBitmap(Bitmap src_bitmap, int targetWidth, int targetHeight) {
-        float scaleWidth = targetWidth / src_bitmap.getWidth();
-        float scaleHeight = targetHeight / src_bitmap.getHeight();
+        float scaleWidth = (float)targetWidth / src_bitmap.getWidth();
+        float scaleHeight = (float)targetHeight / src_bitmap.getHeight();
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
 

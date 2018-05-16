@@ -2,7 +2,7 @@
 <litepal>
     <dbname value="Face" />
 
-    <version value="6" />
+    <version value="7" />
 
     <list>
         <mapping class="com.example.fengs.campusattendance.database.GroupDB" />

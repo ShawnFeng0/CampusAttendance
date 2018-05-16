@@ -13,7 +13,7 @@ public class GroupDB extends DataSupport {
     private String groupID;
     private String groupName;
     private List<Face> faces;
-    private byte[] groupImageData;
+    private byte[] groupImageData = new byte[0];
 
     public GroupDB(){
         faces = new ArrayList<>();

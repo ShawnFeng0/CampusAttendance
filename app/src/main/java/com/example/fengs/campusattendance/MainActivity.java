@@ -1,16 +1,15 @@
 package com.example.fengs.campusattendance;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -20,7 +19,6 @@ import com.example.fengs.campusattendance.database.GroupDB;
 
 import org.litepal.crud.DataSupport;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -28,7 +26,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int REQUEST_CODE_IMAGE_CAMERA = 1;
     private static final int REQUEST_CODE_REGISTER = 2;
     private Spinner groupSpinner;
+    private ImageView groupBigImage;
     private List<GroupDB> groupDBList;
+    private GroupDB selectGroupDB;
     private Uri imageFileUri;
 
     @Override
@@ -38,14 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(findViewById(R.id.toolbar));
 
         groupSpinner = findViewById(R.id.group_select_spinner);
-
-        groupDBList = DataSupport.findAll(GroupDB.class);
-
-        ArrayAdapter<GroupDB> arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, groupDBList);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        groupSpinner.setAdapter(arrayAdapter);
+        groupBigImage = findViewById(R.id.group_big_image_view);
 
 //        Button button = this.findViewById(R.id.button_register);
 //        button.setOnClickListener(this);
@@ -56,8 +49,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        groupDBList = DataSupport.findAll(GroupDB.class);
+        ArrayAdapter<GroupDB> arrayAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, groupDBList);
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        groupSpinner.setAdapter(arrayAdapter);
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                 selectGroupDB = (GroupDB) parent.getItemAtPosition(position);
+                 if (selectGroupDB.getGroupImage() != null) {
+                     groupBigImage.setImageBitmap(selectGroupDB.getGroupImage());
+                 } else {
+                     groupBigImage.setImageResource(R.drawable.book_default);
+                 }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                groupBigImage.setImageResource(R.drawable.book_default);
+            }
+        });
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar, menu);
+        getMenuInflater().inflate(R.menu.main_toolbar, menu);
         return true;
     }
 
@@ -85,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.button_addData: {
+            case R.id.button_classes_begin: {
 //                for (int i = 1; i < 10; i++) {
 //                    final String groupID = "142027";
 //                    final String groupName = "通信工程";

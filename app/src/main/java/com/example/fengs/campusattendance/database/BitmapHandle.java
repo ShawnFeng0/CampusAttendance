@@ -7,13 +7,17 @@ import java.io.ByteArrayOutputStream;
 
 public class BitmapHandle {
     public static byte[] bitmapToByte(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        return baos.toByteArray();
+        if (bitmap != null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            return baos.toByteArray();
+        } else {
+            return null;
+        }
     }
 
     public static Bitmap byteToBitmap(byte[] imageData) {
-        if (imageData.length != 0) {
+        if (imageData != null && imageData.length != 0) {
             return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
         } else {
             return null;
