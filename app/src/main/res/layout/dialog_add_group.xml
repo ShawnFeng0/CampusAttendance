@@ -60,6 +60,7 @@
             android:layout_height="wrap_content">
 
             <ImageButton
+                android:id="@+id/group_image_button"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:src="@drawable/add_photos" />

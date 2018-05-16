@@ -15,11 +15,11 @@ public class Face extends DataSupport{
     private byte[] featureData;
     private byte[] faceImageData;
 
-    public byte[] getFaceImageData() {
+    private byte[] getFaceImageData() {
         return faceImageData;
     }
 
-    public void setFaceImageData(byte[] faceImageData) {
+    private void setFaceImageData(byte[] faceImageData) {
         this.faceImageData = faceImageData;
     }
 
@@ -56,24 +56,11 @@ public class Face extends DataSupport{
     }
 
     public Bitmap getFaceImage() {
-        return byteToBitmap(this.getFaceImageData());
+        return BitmapHandle.byteToBitmap(this.getFaceImageData());
     }
 
     public void setFaceImage(Bitmap faceImage) {
-        this.setFaceImageData(bitmapToByte(faceImage));
+        this.setFaceImageData(BitmapHandle.bitmapToByte(faceImage));
     }
 
-    private byte[] bitmapToByte(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        return baos.toByteArray();
-    }
-
-    private Bitmap byteToBitmap(byte[] imageData) {
-        if (imageData.length != 0) {
-            return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-        } else {
-            return null;
-        }
-    }
 }

@@ -43,7 +43,6 @@ import java.util.List;
 public class FaceViewActivity extends AppCompatActivity {
 
     private Bitmap bitmap;
-    private Bitmap mutableBitmap;
     private GroupDB groupDB;
     private List<Face> faceList;
     private RecyclerView recyclerView;
@@ -99,7 +98,7 @@ public class FaceViewActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true); //得到可以被改变的新bitmap
+            Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 
             byte[] bitmap_data;
             bitmap_data = (new Bmp2YUV()).getNV21(bitmap.getWidth(), bitmap.getHeight(), bitmap);

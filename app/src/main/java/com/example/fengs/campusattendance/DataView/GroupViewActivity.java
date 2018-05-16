@@ -1,8 +1,12 @@
 package com.example.fengs.campusattendance.DataView;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,19 +17,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.example.fengs.campusattendance.Bmp2YUV;
 import com.example.fengs.campusattendance.R;
+import com.example.fengs.campusattendance.database.BitmapHandle;
 import com.example.fengs.campusattendance.database.GroupDB;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.IOException;
 import java.util.List;
 
 public class GroupViewActivity extends AppCompatActivity {
 
+    private Bitmap groupImageBitmap;
     private List<GroupDB> groupDBList;
     private RecyclerView recyclerView;
+    EditText dialogGroupIDtext;
+    EditText dialogGroupName;
+    ImageButton dialogGroupImageButton;
     private Uri imageFileUri;
     private static final int REQUEST_CODE_IMAGE_CAMERA = 1;
     private static final int REQUEST_CODE_REGISTER = 2;
@@ -55,6 +67,19 @@ public class GroupViewActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LayoutInflater inflater = getLayoutInflater();
                 final View layout = inflater.inflate(R.layout.dialog_add_group, null);
+
+                dialogGroupIDtext = layout.findViewById(R.id.edit_view_groupID);
+                dialogGroupName = layout.findViewById(R.id.edit_view_group_name);
+                dialogGroupImageButton = layout.findViewById(R.id.group_image_button);
+                dialogGroupImageButton.setOnClickListener(v2 -> {
+                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                    ContentValues values = new ContentValues(1);
+                    values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                    imageFileUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
+                    startActivityForResult(intent, REQUEST_CODE_IMAGE_CAMERA);
+                });
+
                 AlertDialog dialog = new AlertDialog.Builder(GroupViewActivity.this)
                         .setTitle("添加新组")
                         .setView(layout)
@@ -62,12 +87,10 @@ public class GroupViewActivity extends AppCompatActivity {
                         .setNegativeButton("取消",null)
                         .show();
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v1 -> {
-                    EditText groupIDtext = layout.findViewById(R.id.edit_view_groupID);
-                    EditText groupName = layout.findViewById(R.id.edit_view_group_name);
-                    if (!groupIDtext.getText().toString().isEmpty() && !groupName.getText().toString().isEmpty()) {
+                    if (!dialogGroupIDtext.getText().toString().isEmpty() && !dialogGroupName.getText().toString().isEmpty()) {
                         GroupDB groupDB = new GroupDB();
-                        groupDB.setGroupID(groupIDtext.getText().toString());
-                        groupDB.setGroupName(groupName.getText().toString());
+                        groupDB.setGroupID(dialogGroupIDtext.getText().toString());
+                        groupDB.setGroupName(dialogGroupName.getText().toString());
                         groupDB.save();
                         recyclerViewUpdate(); //更新分组列表
                         dialog.dismiss();
@@ -82,6 +105,21 @@ public class GroupViewActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_IMAGE_CAMERA && resultCode == RESULT_OK) {
+            try {
+                groupImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageFileUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            groupImageBitmap = getZoomBitmap(groupImageBitmap, 300, 600);
+            dialogGroupImageButton.setImageBitmap(groupImageBitmap);
+        }
+    }
 
     /**
      * 更新数据列表
@@ -90,6 +128,23 @@ public class GroupViewActivity extends AppCompatActivity {
         groupDBList = DataSupport.findAll(GroupDB.class);
         final GroupAdapter adapter = new GroupAdapter(groupDBList);
         recyclerView.setAdapter(adapter);
+    }
+
+    /**
+     * 得到缩放后的Bitmap
+     * @param src_bitmap
+     * @param targetWidth
+     * @param targetHeight
+     * @return
+     */
+    private Bitmap getZoomBitmap(Bitmap src_bitmap, int targetWidth, int targetHeight) {
+        float scaleWidth = targetWidth / src_bitmap.getWidth();
+        float scaleHeight = targetHeight / src_bitmap.getHeight();
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        return Bitmap.createBitmap(src_bitmap,
+                0, 0, src_bitmap.getWidth(), src_bitmap.getHeight(), matrix, true);
     }
 
     /**

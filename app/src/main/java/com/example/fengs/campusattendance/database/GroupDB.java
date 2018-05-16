@@ -1,5 +1,7 @@
 package com.example.fengs.campusattendance.database;
 
+import android.graphics.Bitmap;
+
 import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ public class GroupDB extends DataSupport {
     private String groupID;
     private String groupName;
     private List<Face> faces;
+    private byte[] groupImageData;
 
     public GroupDB(){
         faces = new ArrayList<>();
@@ -51,5 +54,21 @@ public class GroupDB extends DataSupport {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    private byte[] getGroupImageData() {
+        return groupImageData;
+    }
+
+    private void setGroupImageData(byte[] groupImageData) {
+        this.groupImageData = groupImageData;
+    }
+
+    public Bitmap getGroupImage() {
+        return BitmapHandle.byteToBitmap(this.getGroupImageData());
+    }
+
+    public void setGroupImage(Bitmap groupImage) {
+        this.setGroupImageData(BitmapHandle.bitmapToByte(groupImage));
     }
 }
