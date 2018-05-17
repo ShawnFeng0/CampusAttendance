@@ -1,9 +1,7 @@
 package com.example.fengs.campusattendance.DataView;
 
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -62,7 +60,7 @@ public class FaceViewActivity extends AppCompatActivity {
         int group_id = getIntent().getIntExtra("groupID", 0);
         groupDB = DataSupport.find(GroupDB.class, group_id);
         TextView face_title_text = findViewById(R.id.face_title_text);
-        face_title_text.setText(groupDB.getGroupID() + ":" + groupDB.getGroupName());
+        face_title_text.setText(groupDB.getGroupCourse() + ":" + groupDB.getGroupName());
 
         bigImageView = findViewById(R.id.face_big_image_view);
 
@@ -74,7 +72,7 @@ public class FaceViewActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL)); //水平方向的竖直分割线
 
         Button back_button = findViewById(R.id.face_back_button);
-        back_button.setOnClickListener(v -> finish());
+        back_button.setOnClickListener(v -> onBackPressed());
         Button add_button = findViewById(R.id.face_add_button);
         add_button.setOnClickListener(v -> imageCapture());
 
@@ -95,6 +93,7 @@ public class FaceViewActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_IMAGE_CAMERA && resultCode == RESULT_OK) {
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageFileUri);
+                this.getContentResolver().delete(imageFileUri, null, null);
             } catch (IOException e) {
                 e.printStackTrace();
             }

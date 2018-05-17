@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.fengs.campusattendance.R;
 import com.example.fengs.campusattendance.database.GroupDB;
@@ -57,7 +56,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
                 final int position = viewHolder.getAdapterPosition();
                 final GroupDB groupDB = groupDBList.get(position);
                 AlertDialog.Builder dialog = new AlertDialog.Builder(v.getContext());
-                dialog.setMessage("确认删除：" + groupDB.getGroupID() + "_" + groupDB.getGroupName() + "?");
+                dialog.setMessage("确认删除：" + groupDB.getGroupCourse() + "_" + groupDB.getGroupName() + "?");
                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

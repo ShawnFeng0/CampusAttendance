@@ -55,10 +55,9 @@
         android:layout_height="49dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="24dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,10 +65,11 @@
 
         <Button
             android:id="@+id/button_classes_begin"
-            android:layout_width="200dp"
+            android:layout_width="250dp"
             android:layout_height="50dp"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:text="开始上课" />
+            android:backgroundTint="@android:color/holo_blue_light"
+            android:text="开始签到"
+            android:textAlignment="center" />
     </LinearLayout>
 
     <ImageView

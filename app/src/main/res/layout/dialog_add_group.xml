@@ -19,7 +19,7 @@
             android:textAlignment="viewEnd" />
 
         <EditText
-            android:id="@+id/edit_view_groupID"
+            android:id="@+id/edit_view_group_course"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:hint="如:信号与系统"

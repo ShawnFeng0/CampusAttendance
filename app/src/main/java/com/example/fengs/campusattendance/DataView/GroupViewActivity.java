@@ -1,7 +1,6 @@
 package com.example.fengs.campusattendance.DataView;
 
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -20,12 +19,9 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.fengs.campusattendance.Bmp2YUV;
 import com.example.fengs.campusattendance.R;
-import com.example.fengs.campusattendance.database.BitmapHandle;
 import com.example.fengs.campusattendance.database.GroupDB;
 
 import org.litepal.crud.DataSupport;
@@ -36,9 +32,8 @@ import java.util.List;
 public class GroupViewActivity extends AppCompatActivity {
 
     private Bitmap groupImageBitmap;
-    private List<GroupDB> groupDBList;
     private RecyclerView recyclerView;
-    EditText dialogGroupIDtext;
+    EditText dialogGroupCourse;
     EditText dialogGroupName;
     ImageButton dialogGroupImageButton;
     private Uri imageFileUri;
@@ -71,7 +66,7 @@ public class GroupViewActivity extends AppCompatActivity {
                 LayoutInflater inflater = getLayoutInflater();
                 final View layout = inflater.inflate(R.layout.dialog_add_group, null);
 
-                dialogGroupIDtext = layout.findViewById(R.id.edit_view_groupID);
+                dialogGroupCourse = layout.findViewById(R.id.edit_view_group_course);
                 dialogGroupName = layout.findViewById(R.id.edit_view_group_name);
                 dialogGroupImageButton = layout.findViewById(R.id.group_image_button);
                 dialogGroupImageButton.setOnClickListener(v2 -> {
@@ -90,10 +85,10 @@ public class GroupViewActivity extends AppCompatActivity {
                         .setNegativeButton("取消",null)
                         .show();
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((View v1) -> {
-                    if (!dialogGroupIDtext.getText().toString().isEmpty()
+                    if (!dialogGroupCourse.getText().toString().isEmpty()
                             && !dialogGroupName.getText().toString().isEmpty()) {
                         GroupDB groupDB = new GroupDB();
-                        groupDB.setGroupID(dialogGroupIDtext.getText().toString());
+                        groupDB.setGroupCourse(dialogGroupCourse.getText().toString());
                         groupDB.setGroupName(dialogGroupName.getText().toString());
                         groupDB.setGroupImage(groupImageBitmap);
                         groupDB.save();
@@ -117,6 +112,7 @@ public class GroupViewActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_IMAGE_CAMERA && resultCode == RESULT_OK) {
             try {
                 groupImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageFileUri);
+                this.getContentResolver().delete(imageFileUri, null, null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -134,7 +130,7 @@ public class GroupViewActivity extends AppCompatActivity {
      * 更新数据列表
      */
     private void recyclerViewUpdate() {
-        groupDBList = DataSupport.findAll(GroupDB.class);
+        List<GroupDB> groupDBList = DataSupport.findAll(GroupDB.class);
         final GroupAdapter adapter = new GroupAdapter(groupDBList);
         recyclerView.setAdapter(adapter);
     }
@@ -163,7 +159,7 @@ public class GroupViewActivity extends AppCompatActivity {
     public void faceView(GroupDB groupDB) {
         Intent intent = new Intent(GroupViewActivity.this, FaceViewActivity.class);
         intent.putExtra("groupID", groupDB.getId());
-        startActivityForResult(intent, REQUEST_CODE_REGISTER);
+        startActivity(intent);
     }
 
     @Override

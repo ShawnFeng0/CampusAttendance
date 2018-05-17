@@ -1,6 +1,5 @@
 package com.example.fengs.campusattendance.DataView;
 
-import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +17,7 @@ import org.litepal.crud.DataSupport;
 
 import java.util.List;
 
-public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
+public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.ViewHolder> {
     private List<Face> faceList;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -34,7 +33,7 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
         }
     }
 
-    public FaceAdapter(List<Face> faceDBLt) {
+    public SignInFaceAdapter(List<Face> faceDBLt) {
         faceList = faceDBLt;
     }
 
@@ -42,7 +41,7 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.face_item, parent, false);
+                .inflate(R.layout.sign_in_face_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
 
         /* 短按大图显示 */
@@ -51,25 +50,12 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
             Face face = faceList.get(position);
             Toast.makeText(parent.getContext(),
                     "学号: " + face.getFaceID() + ", 姓名: " + face.getFaceName(), Toast.LENGTH_SHORT).show();
-            ((FaceViewActivity)(parent.getContext())).setBigImageView(face.getFaceImage());
         });
 
         /* 长按删除 */
         viewHolder.faceView.setOnLongClickListener(v -> {
             final int position = viewHolder.getAdapterPosition();
             final Face face = faceList.get(position);
-            AlertDialog.Builder dialog = new AlertDialog.Builder(v.getContext());
-            dialog.setMessage("确认删除：" + face.getFaceName());
-            dialog.setPositiveButton("确定", (dialog12, which) -> {
-                removeData(position);
-                if (faceList.size() != 0) {
-                    ((FaceViewActivity) (parent.getContext())).setBigImageView(faceList.get(position == faceList.size() ? position - 1 : position).getFaceImage());
-                } else {
-                    ((FaceViewActivity)(parent.getContext())).setBigImageView(R.drawable.add_photos);
-                }
-                dialog12.dismiss();
-            }).setNegativeButton("取消", (dialog1, which) -> dialog1.dismiss());
-            dialog.show();
 
             return true;
         });
@@ -89,7 +75,6 @@ public class FaceAdapter extends RecyclerView.Adapter<FaceAdapter.ViewHolder> {
     }
 
     private void removeData(int position) {
-        DataSupport.delete(Face.class, faceList.get(position).getId());
         faceList.remove(position);
         notifyItemRemoved(position);
     }

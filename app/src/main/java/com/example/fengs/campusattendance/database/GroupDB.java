@@ -10,7 +10,7 @@ import java.util.List;
 
 public class GroupDB extends DataSupport {
     private int id;
-    private String groupID;
+    private String groupCourse;
     private String groupName;
     private List<Face> faces;
     private byte[] groupImageData = new byte[0];
@@ -19,12 +19,12 @@ public class GroupDB extends DataSupport {
         faces = new ArrayList<>();
     }
 
-    public String getGroupID() {
-        return groupID;
+    public String getGroupCourse() {
+        return groupCourse;
     }
 
-    public void setGroupID(String groupID) {
-        this.groupID = groupID;
+    public void setGroupCourse(String groupCourse) {
+        this.groupCourse = groupCourse;
     }
 
     public String getGroupName() {
@@ -45,7 +45,7 @@ public class GroupDB extends DataSupport {
     }
 
     public String toString() {
-        return this.getGroupID() + ":" + this.getGroupName();
+        return this.getGroupCourse() + ":" + this.getGroupName();
     }
 
     public int getId() {

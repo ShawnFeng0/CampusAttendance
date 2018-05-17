@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -23,10 +24,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private static final int REQUEST_CODE_IMAGE_CAMERA = 1;
-    private static final int REQUEST_CODE_REGISTER = 2;
     private Spinner groupSpinner;
     private ImageView groupBigImage;
+    private Button button_classes_begin;
     private List<GroupDB> groupDBList;
     private GroupDB selectGroupDB;
     private Uri imageFileUri;
@@ -39,13 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         groupSpinner = findViewById(R.id.group_select_spinner);
         groupBigImage = findViewById(R.id.group_big_image_view);
-
-//        Button button = this.findViewById(R.id.button_register);
-//        button.setOnClickListener(this);
-//        button = this.findViewById(R.id.button_recognition);
-//        button.setOnClickListener(this);
-//        button = this.findViewById(R.id.button_addData);
-//        button.setOnClickListener(this);
+        button_classes_begin = findViewById(R.id.button_classes_begin);
+        button_classes_begin.setOnClickListener(this);
     }
 
     @Override
@@ -76,12 +71,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    /**
+     * 创建右上角菜单
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_toolbar, menu);
         return true;
     }
 
+    /**
+     * 菜单选项
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -93,35 +98,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_CODE_IMAGE_CAMERA && resultCode == RESULT_OK) {
-            Intent intent = new Intent(MainActivity.this, FaceViewActivity.class);
-            intent.putExtra("imageUri", imageFileUri);
-            startActivityForResult(intent, REQUEST_CODE_REGISTER);
-        }
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_classes_begin: {
-//                for (int i = 1; i < 10; i++) {
-//                    final String groupID = "142027";
-//                    final String groupName = "通信工程";
-//                    GroupDB group = new GroupDB();
-//                    group.setGroupID(groupID + String.valueOf(i));
-//                    group.setGroupName(groupName + String.valueOf(i));
-////                    Face face_temp = new Face();
-////                    face_temp.setFaceID("142027339");
-////                    face_temp.setFaceName();
-////                    face_temp.save();
-////                    group.getStudentsGroup().add(face_temp);
-//                    group.save();
-//                }
-
-                Toast.makeText(this, "You clicked group database", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, ClassActivity.class);
+                intent.putExtra("groupID", selectGroupDB.getId());
+                startActivity(intent);
             }
         }
     }

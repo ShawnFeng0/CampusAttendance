@@ -40,4 +40,5 @@ dependencies {
     implementation files('libs/ageestimation.jar')
     implementation files('libs/genderestimation.jar')
     implementation 'org.litepal.android:core:1.6.1'
+    implementation 'com.android.support:mediarouter-v7:27.1.1'
 }
