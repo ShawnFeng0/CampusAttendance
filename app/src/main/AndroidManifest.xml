@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.fengs.campusattendance">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera2.full" />
     <!-- sdcard -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -22,9 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DataView.FaceViewActivity" />
-        <activity android:name=".DataView.GroupViewActivity" />
+        <activity android:name=".dataView.FaceViewActivity" />
+        <activity android:name=".dataView.GroupViewActivity" />
         <activity android:name=".ClassActivity" />
+        <activity android:name=".AndroidCamera2Api" />
     </application>
 
 </manifest>

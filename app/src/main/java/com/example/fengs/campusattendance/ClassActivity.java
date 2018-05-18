@@ -7,11 +7,10 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.view.SurfaceView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import com.example.fengs.campusattendance.DataView.FaceAdapter;
-import com.example.fengs.campusattendance.DataView.SignInFaceAdapter;
+import com.example.fengs.campusattendance.dataView.SignInFaceAdapter;
 import com.example.fengs.campusattendance.database.Face;
 import com.example.fengs.campusattendance.database.GroupDB;
 
@@ -23,6 +22,8 @@ public class ClassActivity extends AppCompatActivity {
 
     private GroupDB groupDB;
     private RecyclerView recyclerView;
+    private SurfaceView surfaceView;
+//    private SurfaceViewCallback surfaceViewCallback = new SurfaceViewCallback();
     private List<Face> faceList;
 
     @Override
@@ -45,6 +46,10 @@ public class ClassActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         recycleViewUpdate();
+
+//        surfaceView = findViewById(R.id.);
+//        surfaceView.getHolder().addCallback(surfaceViewCallback);
+
     }
 
     @Override
@@ -63,6 +68,6 @@ public class ClassActivity extends AppCompatActivity {
         faceList = groupDB.getFaces();
         final SignInFaceAdapter adapter = new SignInFaceAdapter(faceList);
         recyclerView.setAdapter(adapter);
-        Toast.makeText(ClassActivity.this, "人脸数量: " + faceList.size(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(ClassActivity.this, "人数: " + faceList.size(), Toast.LENGTH_SHORT).show();
     }
 }

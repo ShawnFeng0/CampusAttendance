@@ -1,6 +1,5 @@
-package com.example.fengs.campusattendance.DataView;
+package com.example.fengs.campusattendance.dataView;
 
-import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;

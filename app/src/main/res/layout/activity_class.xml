@@ -26,14 +26,13 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <SurfaceView
-        android:id="@+id/surfaceView"
+    <TextureView
+        android:id="@+id/texture"
         android:layout_width="0dp"
-        android:layout_height="488dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/sign_in_recyclerView"
@@ -62,33 +61,37 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/surfaceView"
+        app:layout_constraintEnd_toStartOf="@+id/texture"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
         android:id="@+id/button"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="103dp"
         android:layout_marginStart="102dp"
+        android:layout_marginTop="16dp"
         android:text="生成未签到学生列表"
         android:textAlignment="center"
+        android:textColor="@android:color/holo_blue_light"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/sign_in_recyclerView"
-        app:layout_constraintTop_toBottomOf="@+id/surfaceView" />
+        app:layout_constraintTop_toBottomOf="@+id/texture" />
 
     <View
         android:id="@+id/view"
         android:layout_width="3px"
         android:layout_height="0dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="1dp"
         android:layout_marginStart="8dp"
         android:background="@android:color/darker_gray"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/surfaceView"
+        app:layout_constraintEnd_toStartOf="@+id/texture"
         app:layout_constraintStart_toEndOf="@+id/sign_in_recyclerView"
         app:layout_constraintTop_toBottomOf="@+id/class_activity_toolbar"
         app:layout_constraintVertical_bias="0.0" />

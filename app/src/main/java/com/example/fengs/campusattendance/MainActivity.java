@@ -1,5 +1,7 @@
 package com.example.fengs.campusattendance;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
-import com.example.fengs.campusattendance.DataView.FaceViewActivity;
-import com.example.fengs.campusattendance.DataView.GroupViewActivity;
+import com.example.fengs.campusattendance.dataView.GroupViewActivity;
 import com.example.fengs.campusattendance.database.GroupDB;
 
 import org.litepal.crud.DataSupport;
@@ -101,9 +101,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_classes_begin: {
-                Intent intent = new Intent(MainActivity.this, ClassActivity.class);
-                intent.putExtra("groupID", selectGroupDB.getId());
-                startActivity(intent);
+                new AlertDialog.Builder(this)
+                        .setTitle("请选择相机")
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setItems(new String[]{"后置相机", "前置相机"}, (dialog, which) -> {
+                            Intent intent = new Intent(MainActivity.this, AndroidCamera2Api.class);
+                            intent.putExtra("groupID", selectGroupDB.getId());
+                            if (which == 0) {
+                                intent.putExtra("camera", "back");
+                            } else {
+                                intent.putExtra("camera", "front");
+                            }
+                            startActivity(intent);
+                        })
+                        .show();
             }
         }
     }

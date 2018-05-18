@@ -1,7 +1,6 @@
-package com.example.fengs.campusattendance.DataView;
+package com.example.fengs.campusattendance.dataView;
 
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +11,6 @@ import android.widget.Toast;
 
 import com.example.fengs.campusattendance.R;
 import com.example.fengs.campusattendance.database.Face;
-
-import org.litepal.crud.DataSupport;
 
 import java.util.List;
 
@@ -44,15 +41,13 @@ public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.Vi
                 .inflate(R.layout.sign_in_face_item, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
 
-        /* 短按大图显示 */
         viewHolder.faceView.setOnClickListener(v -> {
             int position = viewHolder.getAdapterPosition();
             Face face = faceList.get(position);
             Toast.makeText(parent.getContext(),
-                    "学号: " + face.getFaceID() + ", 姓名: " + face.getFaceName(), Toast.LENGTH_SHORT).show();
+                    "学号: " + face.getFaceID() + "  " + "姓名: " + face.getFaceName(), Toast.LENGTH_SHORT).show();
         });
 
-        /* 长按删除 */
         viewHolder.faceView.setOnLongClickListener(v -> {
             final int position = viewHolder.getAdapterPosition();
             final Face face = faceList.get(position);

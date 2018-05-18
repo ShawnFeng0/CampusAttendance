@@ -1,4 +1,4 @@
-package com.example.fengs.campusattendance.DataView;
+package com.example.fengs.campusattendance.dataView;
 
 import android.content.ContentValues;
 import android.content.Intent;
