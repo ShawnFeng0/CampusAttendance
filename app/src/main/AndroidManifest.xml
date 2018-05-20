@@ -28,7 +28,6 @@
         <activity android:name=".dataView.FaceViewActivity" />
         <activity android:name=".dataView.GroupViewActivity" />
         <activity android:name=".ClassActivity" />
-        <activity android:name=".AndroidCamera2Api" />
     </application>
 
 </manifest>

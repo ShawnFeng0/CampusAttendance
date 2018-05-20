@@ -1,7 +1,6 @@
 package com.example.fengs.campusattendance;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .setTitle("请选择相机")
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setItems(new String[]{"后置相机", "前置相机"}, (dialog, which) -> {
-                            Intent intent = new Intent(MainActivity.this, AndroidCamera2Api.class);
+                            Intent intent = new Intent(MainActivity.this, ClassActivity.class);
                             intent.putExtra("groupID", selectGroupDB.getId());
                             if (which == 0) {
                                 intent.putExtra("camera", "back");

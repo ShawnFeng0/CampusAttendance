@@ -30,6 +30,7 @@ import com.arcsoft.facerecognition.AFR_FSDKFace;
 import com.example.fengs.campusattendance.Bmp2YUV;
 import com.example.fengs.campusattendance.FaceRecognition;
 import com.example.fengs.campusattendance.R;
+import com.example.fengs.campusattendance.database.BitmapHandle;
 import com.example.fengs.campusattendance.database.Face;
 import com.example.fengs.campusattendance.database.GroupDB;
 
@@ -100,13 +101,13 @@ public class FaceViewActivity extends AppCompatActivity {
             Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 
             byte[] bitmap_data;
-            bitmap_data = (new Bmp2YUV()).getNV21(bitmap.getWidth(), bitmap.getHeight(), bitmap);
+            bitmap_data = Bmp2YUV.getNV21(bitmap.getWidth(), bitmap.getHeight(), bitmap);
 
             Log.d(TAG, "onCreate: ");
-            List<AFD_FSDKFace> result = FaceRecognition.FaceDetectionProcess(bitmap_data, bitmap.getWidth(), bitmap.getHeight());
+            List<AFD_FSDKFace> result = FaceRecognition.singleFaceDetectionProcess(bitmap_data, bitmap.getWidth(), bitmap.getHeight());
 
             if (!result.isEmpty()) {
-                AFD_FSDKFace faceRect = FaceRecognition.getMaxFace(result);
+                AFD_FSDKFace faceRect = FaceRecognition.AFD_getMaxFace(result);
 
                 int width = faceRect.getRect().width()/30 > 10 ? faceRect.getRect().width()/30 : 10;
                 Canvas canvas = new Canvas(mutableBitmap);
@@ -115,11 +116,12 @@ public class FaceViewActivity extends AppCompatActivity {
                 paint.setStrokeWidth(width);
                 paint.setStyle(Paint.Style.STROKE);
 
-                Rect rect = getRealFaceRect(bitmap, faceRect.getRect());
+                Rect rect = BitmapHandle.getRealFaceRect(bitmap, faceRect.getRect());
 
                 canvas.drawRect(rect, paint);
 
-                AFR_FSDKFace faceFeature = FaceRecognition.getFaceFeature(bitmap_data, bitmap.getWidth(), bitmap.getHeight(), faceRect);
+                AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(bitmap_data, bitmap.getWidth(), bitmap.getHeight(), faceRect.getRect(), faceRect.getDegree());
+                Log.i(TAG, "faceInfo: " + faceRect.toString());
 
                 //弹出添加人脸的窗口
                 LayoutInflater inflater = getLayoutInflater();
@@ -203,40 +205,6 @@ public class FaceViewActivity extends AppCompatActivity {
 
         return Bitmap.createBitmap(src_bitmap,
                 rect.left, rect.top, rect.width(), rect.height(), matrix, true);
-    }
-
-    /**
-     * 得到一个真实的人脸矩形框
-     * 人脸识别引擎得到的人脸矩形框比较小, 所以稍微放大一点
-     * @param src_bitmap
-     * @param rect
-     * @return
-     */
-    private Rect getRealFaceRect(Bitmap src_bitmap, Rect rect) {
-        //特别是上边框比较小
-        if (rect.top - rect.height()/4 > 0) {
-            rect.top -= rect.height()/4;
-            if (rect.left - rect.width()/8 > 0) {
-                rect.left -= rect.width()/8;
-            } else {
-                rect.left = 0;
-            }
-            if (rect.right + rect.width()/8 < src_bitmap.getWidth()) {
-                rect.right += rect.width()/8;
-            } else {
-                rect.right = src_bitmap.getWidth();
-            }
-        } else {
-            rect.top = 0;
-        }
-
-        if (rect.bottom + rect.height()/8 < src_bitmap.getHeight()) {
-            rect.bottom += rect.height()/8;
-        } else {
-            rect.bottom = src_bitmap.getHeight();
-        }
-
-        return rect;
     }
 
     /**

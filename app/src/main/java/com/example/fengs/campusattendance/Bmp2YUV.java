@@ -3,12 +3,19 @@ package com.example.fengs.campusattendance;
 import android.graphics.Bitmap;
 
 public class Bmp2YUV {
-    public byte[] getNV21(int inputWidth, int inputHeight, Bitmap scaled) {
+
+    public static byte[] getNV21(int inputWidth, int inputHeight, Bitmap scaled) {
         int [] argb = new int[inputWidth * inputHeight];
 
         scaled.getPixels(argb, 0, inputWidth, 0, 0, inputWidth, inputHeight);
 
-        byte [] yuv = new byte[inputWidth*inputHeight*3/2];
+//        byte [] yuv = new byte[inputWidth*inputHeight*3/2];
+        /*
+        encodeYUV420SP throws ArrayIndexOutOfRange Exception when inputWidth or inputHeight is an odd number.
+        Declaring the yuv array as byte [] yuv = new byte[inputHeight * inputWidth + 2 * (int) Math.ceil(inputHeight/2.0) *(int) Math.ceil(inputWidth/2.0)];
+        solved the issue
+         */
+        byte [] yuv = new byte[inputHeight * inputWidth + 2 * (int) Math.ceil(inputHeight/2.0) *(int) Math.ceil(inputWidth/2.0)];
         encodeYUV420SP(yuv, argb, inputWidth, inputHeight);
 
 //        scaled.recycle();
@@ -16,7 +23,7 @@ public class Bmp2YUV {
         return yuv;
     }
 
-    private void encodeYUV420SP(byte[] yuv420sp, int[] argb, int width, int height) {
+    private static void encodeYUV420SP(byte[] yuv420sp, int[] argb, int width, int height) {
         final int frameSize = width * height;
 
         int yIndex = 0;

@@ -26,17 +26,38 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <TextureView
-        android:id="@+id/texture"
+    <FrameLayout
+        android:id="@+id/camera_frameLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginBottom="15dp"
         android:layout_marginEnd="1dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="1dp"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/sign_in_recyclerView"
-        app:layout_constraintTop_toBottomOf="@+id/class_activity_toolbar" />
+        app:layout_constraintStart_toEndOf="@+id/divider_view"
+        app:layout_constraintTop_toBottomOf="@+id/class_activity_toolbar">
+
+        <TextureView
+            android:id="@+id/camera_texture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <SurfaceView
+            android:id="@+id/canvas_surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/current_face_imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@android:color/darker_gray"
+            android:scaleType="centerInside" />
+
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/textView"
@@ -56,12 +77,12 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/sign_in_recyclerView"
-        android:layout_width="wrap_content"
+        android:layout_width="60dp"
         android:layout_height="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/texture"
+        app:layout_constraintEnd_toStartOf="@+id/divider_view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -81,17 +102,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/sign_in_recyclerView"
-        app:layout_constraintTop_toBottomOf="@+id/texture" />
+        app:layout_constraintTop_toBottomOf="@+id/camera_frameLayout" />
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/divider_view"
         android:layout_width="3px"
         android:layout_height="0dp"
         android:layout_marginEnd="1dp"
-        android:layout_marginStart="8dp"
         android:background="@android:color/darker_gray"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/texture"
+        app:layout_constraintEnd_toStartOf="@+id/camera_frameLayout"
         app:layout_constraintStart_toEndOf="@+id/sign_in_recyclerView"
         app:layout_constraintTop_toBottomOf="@+id/class_activity_toolbar"
         app:layout_constraintVertical_bias="0.0" />
