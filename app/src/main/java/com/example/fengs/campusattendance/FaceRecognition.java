@@ -9,6 +9,7 @@ import com.arcsoft.facedetection.AFD_FSDKFace;
 import com.arcsoft.facerecognition.AFR_FSDKEngine;
 import com.arcsoft.facerecognition.AFR_FSDKError;
 import com.arcsoft.facerecognition.AFR_FSDKFace;
+import com.arcsoft.facerecognition.AFR_FSDKMatching;
 import com.arcsoft.facetracking.AFT_FSDKEngine;
 import com.arcsoft.facetracking.AFT_FSDKError;
 import com.arcsoft.facetracking.AFT_FSDKFace;
@@ -58,7 +59,7 @@ public class FaceRecognition {
         Log.d("com.arcsoft", "AFT_FSDK_UninitialFaceEngine =" + AFT_err.getCode());
     }
 
-    public static List<AFD_FSDKFace> singleFaceDetectionProcess(byte[] data, int width, int height) {
+    public static List<AFD_FSDKFace> singleFaceDetection(byte[] data, int width, int height) {
         AFD_FSDKEngine engine = new AFD_FSDKEngine();
 
         // 用来存放检测到的人脸信息列表
@@ -104,7 +105,33 @@ public class FaceRecognition {
         return faceFeature;
     }
 
-    public static AFD_FSDKFace AFD_getMaxFace(List<AFD_FSDKFace> result) {
+    /**
+     * 对比人脸信息
+     * @param face1
+     * @param face2
+     * @return
+     */
+    public static float singleFaceMatching(AFR_FSDKFace face1, AFR_FSDKFace face2) {
+        AFR_FSDKEngine engine = new AFR_FSDKEngine();
+
+        //初始化人脸识别引擎，使用时请替换申请的APPID 和SDKKEY
+        AFR_FSDKError error = engine.AFR_FSDK_InitialEngine(APPID, FR_KEY);
+        Log.d("com.arcsoft", "AFR_FSDK_InitialEngine = " + error.getCode());
+
+        //score用于存放人脸对比的相似度值
+        AFR_FSDKMatching score = new AFR_FSDKMatching();
+        error = engine.AFR_FSDK_FacePairMatching(face1, face2, score);
+        Log.d("com.arcsoft", "AFR_FSDK_FacePairMatching=" + error.getCode());
+        Log.d("com.arcsoft", "Score:" + score.getScore());
+
+        //销毁人脸识别引擎
+        error = engine.AFR_FSDK_UninitialEngine();
+        Log.d("com.arcsoft", "AFR_FSDK_UninitialEngine : " + error.getCode());
+
+        return score.getScore();
+    }
+
+    public static AFD_FSDKFace getMaxFace_AFD(List<AFD_FSDKFace> result) {
 
         int area_t;
         int area_max = 0;
@@ -125,7 +152,7 @@ public class FaceRecognition {
         return face_max;
     }
 
-    public static AFT_FSDKFace AFT_getMaxFace(List<AFT_FSDKFace> result) {
+    public static AFT_FSDKFace getMaxFace_AFT(List<AFT_FSDKFace> result) {
 
         int area_t;
         int area_max = 0;

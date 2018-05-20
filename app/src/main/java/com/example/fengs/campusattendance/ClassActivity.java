@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
@@ -48,6 +47,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.arcsoft.facedetection.AFD_FSDKFace;
 import com.arcsoft.facerecognition.AFR_FSDKFace;
 import com.arcsoft.facetracking.AFT_FSDKFace;
 import com.example.fengs.campusattendance.dataView.SignInFaceAdapter;
@@ -57,7 +57,6 @@ import com.example.fengs.campusattendance.database.GroupDB;
 
 import org.litepal.crud.DataSupport;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,7 +65,7 @@ public class ClassActivity extends AppCompatActivity {
     private static final String TAG = "ClassActivity";
     private TextureView textureView;
     private SurfaceView surfaceView;
-    private ImageView imageView;
+    private ImageView current_face_imageView;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -125,7 +124,7 @@ public class ClassActivity extends AppCompatActivity {
         textureView.setSurfaceTextureListener(textureListener);
 
 
-        imageView = findViewById(R.id.current_face_imageView);
+        current_face_imageView = findViewById(R.id.current_face_imageView);
 
         faceRecognition = new FaceRecognition(); //人脸跟踪相关
     }
@@ -152,13 +151,13 @@ public class ClassActivity extends AppCompatActivity {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
             long time = System.currentTimeMillis();
 //            Bitmap bitmap = textureView.getBitmap();
-//            imageView.setImageBitmap(bitmap);
+//            current_face_imageView.setImageBitmap(bitmap);
 
             /* 第一次运行 或 上次任务已经结束  注意每次需new一个实例,新建的任务只能执行一次,否则会出现异常 */
-            if (drawRectTask == null || drawRectTask.getStatus() != AsyncTask.Status.RUNNING) {
-                drawRectTask = new DrawRectTask();
+//            if (drawRectTask == null || drawRectTask.getStatus() != AsyncTask.Status.RUNNING) {
+//                drawRectTask = new DrawRectTask();
 //                drawRectTask.execute(bitmap);
-            }
+//            }
         }
     };
 
@@ -166,26 +165,31 @@ public class ClassActivity extends AppCompatActivity {
 
         long time = System.currentTimeMillis();
         Image img = reader.acquireLatestImage();
+        int imgWidth = img.getWidth();
+        int imgHeight = img.getHeight();
 
         preview_image_data = ImageUtil.getBytesFromImageAsType(img, ImageUtil.NV21);
-        List<AFT_FSDKFace> result = faceRecognition.FaceTrackingProcess(preview_image_data, img.getWidth(), img.getHeight());
-
+        List<AFT_FSDKFace> result = faceRecognition.FaceTrackingProcess(preview_image_data, imgWidth, imgHeight);
 
         if (!result.isEmpty()) {
 
-            AFT_FSDKFace faceRect = FaceRecognition.AFT_getMaxFace(result);
-            Log.i(TAG, "faceInfo: " + faceRect.toString());
-//            AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(bitmap_data, bitmap.getWidth(), bitmap.getHeight(), faceRect.getRect(), faceRect.getDegree());
-            Log.i(TAG, "人脸跟踪时间: " + (System.currentTimeMillis() - time));
+            AFT_FSDKFace faceInfo = FaceRecognition.getMaxFace_AFT(result);
+            Log.i(TAG, "faceInfo: " + faceInfo.toString());
 
-            RectF realRect = new RectF(faceRect.getRect());
+            /* 第一次运行 或 上次任务已经结束  注意每次需new一个实例,新建的任务只能执行一次,否则会出现异常 */
+            if (drawRectTask == null || drawRectTask.getStatus() != AsyncTask.Status.RUNNING) {
+                drawRectTask = new DrawRectTask();
+                drawRectTask.execute(preview_image_data, imgWidth, imgHeight, faceInfo);
+            }
+
+            RectF realRect = new RectF(faceInfo.getRect());
             Matrix matrix = new Matrix();
 
             //图片镜像并旋转90度, 变为正常尺寸 720 480
             matrix.setScale(-1, 1);
-            matrix.postTranslate(img.getWidth(), 0);
-            matrix.postRotate(90, img.getWidth()/2, img.getHeight()/2); //旋转90度
-            matrix.postTranslate(0,(img.getWidth()-img.getHeight())/2); //中心对齐
+            matrix.postTranslate(imgWidth, 0);
+            matrix.postRotate(90, imgWidth/2, imgHeight/2); //旋转90度
+            matrix.postTranslate(0,(imgWidth-imgHeight)/2); //中心对齐
             matrix.mapRect(realRect); //矩形框进行矩阵变换
 
 //            float scale = textureView.getWidth() / img.getHeight(); // 840 / 480
@@ -198,7 +202,8 @@ public class ClassActivity extends AppCompatActivity {
             matrix.mapRect(realRect);
 
             //根据矩形的尺寸确定边框的大小
-            float width = realRect.width() / 30 > 10 ? realRect.width() / 30 : 10;
+//            float width = realRect.width() / 30 > 10 ? realRect.width() / 30 : 10;
+            float width = 5;
             Paint rect_paint = new Paint(); //矩形框的画笔
             rect_paint.setColor(Color.GREEN); //颜色
             rect_paint.setStrokeWidth(width); //线宽
@@ -215,6 +220,7 @@ public class ClassActivity extends AppCompatActivity {
             surfaceView.getHolder().unlockCanvasAndPost(rect_canvas);
         }
         img.close(); //释放图片内存
+        Log.i(TAG, "人脸跟踪时间: " + (System.currentTimeMillis() - time));
     }
 
     private void backup_onImageAvailable(ImageReader reader) {
@@ -222,7 +228,7 @@ public class ClassActivity extends AppCompatActivity {
 
         preview_image_data = ImageUtil.getBytesFromImageAsType(img, ImageUtil.NV21);
 //                Bitmap bitmap = BitmapHandle.byteToBitmap(preview_image_data);
-//                imageView.setImageBitmap(bitmap);
+//                current_face_imageView.setImageBitmap(bitmap);
         long time = System.currentTimeMillis();
         Bitmap temp_bitmap = BitmapHandle.rawByteArray2RGBABitmap2(preview_image_data, img.getWidth(), img.getHeight());
 
@@ -257,7 +263,7 @@ public class ClassActivity extends AppCompatActivity {
 
         Log.i(TAG, "图像变换调试textureView: " + "宽: " + textureView.getBitmap().getWidth() + ", 高: " + textureView.getBitmap().getHeight());  //720  480
 //        newBitmap = textureView.getBitmap();
-        runOnUiThread(() -> imageView.setImageBitmap(newNewBitmap));
+        runOnUiThread(() -> current_face_imageView.setImageBitmap(newNewBitmap));
         byte[] bitmap_data;
         bitmap_data = Bmp2YUV.getNV21(newNewBitmap.getWidth(), newNewBitmap.getHeight(), newNewBitmap);
 
@@ -268,7 +274,7 @@ public class ClassActivity extends AppCompatActivity {
 
         if (!result.isEmpty()) {
 
-            AFT_FSDKFace faceRect = FaceRecognition.AFT_getMaxFace(result);
+            AFT_FSDKFace faceRect = FaceRecognition.getMaxFace_AFT(result);
             Log.i(TAG, "faceInfo: " + faceRect.toString());
             //                AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(bitmap_data, bitmap.getWidth(), bitmap.getHeight(), faceRect.getRect(), faceRect.getDegree());
 //                    Log.i(TAG, "人脸跟踪时间: " + (System.currentTimeMillis() - time));
@@ -290,57 +296,53 @@ public class ClassActivity extends AppCompatActivity {
             surfaceView.getHolder().unlockCanvasAndPost(rect_canvas);
         }
     }
-    private class DrawRectTask extends AsyncTask<Bitmap, Void, Rect> {
-        private Bitmap curBitmap;
+    private class DrawRectTask extends AsyncTask<Object, Void, Face> {
 
         @Override
-        protected Rect doInBackground(Bitmap... bitmaps) {
+        protected Face doInBackground(Object... Objects) {
             long time = System.currentTimeMillis();
-            Bitmap bitmap = bitmaps[0];
-            curBitmap = bitmap;
+            byte [] imageByte = (byte[]) Objects[0];
+            Face resultFace = null;
+            int imgWidth = (int) Objects[1];
+            int imgHeight = (int) Objects[2];
+//            AFT_FSDKFace faceInfo = (AFT_FSDKFace) Objects[3];
 
-            byte[] bitmap_data;
-            bitmap_data = Bmp2YUV.getNV21(bitmap.getWidth(), bitmap.getHeight(), bitmap);
-
-            List<AFT_FSDKFace> result = faceRecognition.FaceTrackingProcess(bitmap_data, bitmap.getWidth(), bitmap.getHeight());
-            Log.i(TAG, "bitmap: " + bitmap.getWidth() + "  " + bitmap.getHeight());
+//            imageByte = Bmp2YUV.getNV21(textureView.getWidth(), textureView.getHeight(), textureView.getBitmap());
+//            int imgWidth = textureView.getWidth();
+//            int imgHeight = textureView.getHeight();
+            List<AFD_FSDKFace> result = FaceRecognition.singleFaceDetection(imageByte, imgWidth, imgHeight);
 
             if (!result.isEmpty()) {
-                AFT_FSDKFace faceRect = FaceRecognition.AFT_getMaxFace(result);
-//                AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(bitmap_data, bitmap.getWidth(), bitmap.getHeight(), faceRect.getRect(), faceRect.getDegree());
-                Log.i(TAG, "doInBackground: TIME" + (System.currentTimeMillis() - time));
-                return faceRect.getRect();
-            } else {
-                Log.i(TAG, "doInBackground: TIME" + (System.currentTimeMillis() - time));
-                return null;
+                AFD_FSDKFace faceInfo = FaceRecognition.getMaxFace_AFD(result);
+                AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(imageByte, imgWidth, imgHeight, faceInfo.getRect(), faceInfo.getDegree());
+                AFR_FSDKFace registeredFaceFeature = new AFR_FSDKFace();
+                int i = 0;
+                float maxScore = 0;
+                for (Face face : faceList) {
+                    registeredFaceFeature.setFeatureData(face.getFeatureData());
+                    float score = FaceRecognition.singleFaceMatching(registeredFaceFeature, faceFeature);
+                    if (score > maxScore) {
+                        maxScore = score;
+                        resultFace = face;
+                    }
+                    Log.i(TAG, "SCORE" + (i++) + ": " + score);
+                }
             }
+            return resultFace;
         }
 
         @Override
-        protected void onPostExecute(Rect rect) {
-            super.onPostExecute(rect);
-            if (mBackgroundHandler != null) {
-                mBackgroundHandler.post(() -> {
-                    if (rect != null) {
-                        int width = rect.width() / 30 > 10 ? rect.width() / 30 : 10;
-                        Paint paint = new Paint();
-                        paint.setColor(Color.GREEN);
-                        paint.setStrokeWidth(width);
-                        paint.setStyle(Paint.Style.STROKE);
+        protected void onPostExecute(Face face) {
+            super.onPostExecute(face);
+//            if (bitmap != null) {
+//                current_face_imageView.setImageBitmap(bitmap);
+//            } else {
+//                current_face_imageView.setAlpha(0.1f);
 
-                        Canvas canvas = surfaceView.getHolder().lockCanvas();
-                        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //清楚掉上一次的画框。
-                        canvas.drawRect(rect, paint);
-                        surfaceView.getHolder().unlockCanvasAndPost(canvas);
-                    } else {
-                        Canvas canvas = surfaceView.getHolder().lockCanvas();
-                        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); //清楚掉上一次的画框。
-                        surfaceView.getHolder().unlockCanvasAndPost(canvas);
-                    }
-                });
-            }
+//            }
         }
     }
+
 
     private final CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
@@ -414,42 +416,9 @@ public class ClassActivity extends AppCompatActivity {
         try {
             //设置捕获请求为预览, 还可以设置为拍照录像等
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-
-
             imageReader = ImageReader.newInstance(imageDimension.getWidth(), imageDimension.getHeight(),
                     ImageFormat.YUV_420_888, 2);
             imageReader.setOnImageAvailableListener(this::onImageAvailable, mBackgroundHandler);
-            { //
-//            imageReader = ImageReader.newInstance(imageDimension.getWidth(), imageDimension.getHeight(),
-//                    ImageFormat.JPEG, 4);
-//            imageReader.setOnImageAvailableListener(reader -> {
-//
-//                Image image = reader.acquireLatestImage();
-//                ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-//                byte[] bytes = new byte[buffer.remaining()];
-//                buffer.get(bytes);
-//                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-//                Bitmap newBitmap = Bitmap.createBitmap(imageDimension.getWidth(),imageDimension.getWidth(),bitmap.getConfig());
-//
-//                Canvas canvas = new Canvas(newBitmap);
-//                Paint paint = new Paint();
-//                Matrix matrix = new Matrix();
-//                //图片镜像并旋转90度
-//                matrix.setScale(-1, 1);
-//                matrix.postTranslate(bitmap.getWidth(), 0);
-//                matrix.postRotate(90 ,bitmap.getWidth()/2,bitmap.getHeight()/2);
-//                matrix.postTranslate(0,(bitmap.getWidth()-bitmap.getHeight())/2);
-//
-//                canvas.drawBitmap(bitmap, matrix , paint);
-//
-//                runOnUiThread(() -> {
-//                    imageView.setImageBitmap(newBitmap);
-//                });
-////                bitmap.recycle();
-//                image.close();
-//            }, mBackgroundHandler);
-            }
-
             SurfaceTexture texture = textureView.getSurfaceTexture();
             assert texture != null;
             //设置预览大小
@@ -478,8 +447,6 @@ public class ClassActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-
 
     private void openCamera(String camera_front_or_back) {
         //获得所有摄像头的管理者CameraManager
@@ -633,6 +600,7 @@ public class ClassActivity extends AppCompatActivity {
     }
     private void closeCamera() {
         if (null != cameraDevice) {
+            cameraCaptureSessions.close();
             cameraDevice.close();
             cameraDevice = null;
         }

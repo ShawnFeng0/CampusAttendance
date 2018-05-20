@@ -2,6 +2,7 @@ package com.example.fengs.campusattendance.database;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 
 import java.io.ByteArrayOutputStream;
@@ -91,5 +92,20 @@ public class BitmapHandle {
         }
 
         return rect;
+    }
+
+    /**
+     * 保存人脸图片, 缩放原图
+     * @param src_bitmap
+     * @param rect
+     */
+    public static Bitmap getFaceImage(Bitmap src_bitmap, Rect rect, float targetWidth, float targetHeight) {
+        float scaleWidth = targetWidth / rect.width();
+        float scaleHeight = targetHeight / rect.height();
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        return Bitmap.createBitmap(src_bitmap,
+                rect.left, rect.top, rect.width(), rect.height(), matrix, true);
     }
 }

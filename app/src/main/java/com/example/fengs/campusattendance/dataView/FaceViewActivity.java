@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -61,7 +60,7 @@ public class FaceViewActivity extends AppCompatActivity {
         int group_id = getIntent().getIntExtra("groupID", 0);
         groupDB = DataSupport.find(GroupDB.class, group_id);
         TextView face_title_text = findViewById(R.id.face_title_text);
-        face_title_text.setText(groupDB.getGroupCourse() + ":" + groupDB.getGroupName());
+        face_title_text.setText(String.format("%s:%s", groupDB.getGroupCourse(), groupDB.getGroupName()));
 
         bigImageView = findViewById(R.id.face_big_image_view);
 
@@ -104,10 +103,10 @@ public class FaceViewActivity extends AppCompatActivity {
             bitmap_data = Bmp2YUV.getNV21(bitmap.getWidth(), bitmap.getHeight(), bitmap);
 
             Log.d(TAG, "onCreate: ");
-            List<AFD_FSDKFace> result = FaceRecognition.singleFaceDetectionProcess(bitmap_data, bitmap.getWidth(), bitmap.getHeight());
+            List<AFD_FSDKFace> result = FaceRecognition.singleFaceDetection(bitmap_data, bitmap.getWidth(), bitmap.getHeight());
 
             if (!result.isEmpty()) {
-                AFD_FSDKFace faceRect = FaceRecognition.AFD_getMaxFace(result);
+                AFD_FSDKFace faceRect = FaceRecognition.getMaxFace_AFD(result);
 
                 int width = faceRect.getRect().width()/30 > 10 ? faceRect.getRect().width()/30 : 10;
                 Canvas canvas = new Canvas(mutableBitmap);
@@ -123,23 +122,24 @@ public class FaceViewActivity extends AppCompatActivity {
                 AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(bitmap_data, bitmap.getWidth(), bitmap.getHeight(), faceRect.getRect(), faceRect.getDegree());
                 Log.i(TAG, "faceInfo: " + faceRect.toString());
 
-                //弹出添加人脸的窗口
-                LayoutInflater inflater = getLayoutInflater();
-                final View layout = inflater.inflate(R.layout.dialog_add_face, null);
-                AlertDialog dialog = new AlertDialog.Builder(FaceViewActivity.this)
-                        .setTitle("添加")
-                        .setView(layout)
-                        .setPositiveButton("确定", null)
-                        .setNegativeButton("取消", null)
-                        .show();
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                if (faceFeature.getFeatureData().length > 0) {
+                    //弹出添加人脸的窗口
+                    LayoutInflater inflater = getLayoutInflater();
+                    final View layout = inflater.inflate(R.layout.dialog_add_face, null);
+                    AlertDialog dialog = new AlertDialog.Builder(FaceViewActivity.this)
+                            .setTitle("添加")
+                            .setView(layout)
+                            .setPositiveButton("确定", null)
+                            .setNegativeButton("取消", null)
+                            .show();
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                         EditText faceIDtext = layout.findViewById(R.id.edit_view_faceID);
                         EditText faceName = layout.findViewById(R.id.edit_view_face_name);
                         if (!faceName.getText().toString().isEmpty() && !faceIDtext.getText().toString().isEmpty()) {
                             Face face = new Face();
                             face.setFaceID(faceIDtext.getText().toString());
                             face.setFaceName(faceName.getText().toString());
-                            face.setFaceImage(getFaceImage(bitmap, rect));
+                            face.setFaceImage(BitmapHandle.getFaceImage(bitmap, rect, 400, 400));
                             face.setFeatureData(faceFeature.getFeatureData());
                             face.save();
                             groupDB.getFaces().add(face);
@@ -150,10 +150,12 @@ public class FaceViewActivity extends AppCompatActivity {
                             Toast.makeText(FaceViewActivity.this, "请输入相关信息", Toast.LENGTH_SHORT).show();
                         }
                     });
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
                         dialog.dismiss();
-                });
-
+                    });
+                } else {
+                    Toast.makeText(FaceViewActivity.this, "人脸信息提取失败, 请点击右上角重新添加", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(FaceViewActivity.this, "没有检测到人脸，请换一张图片", Toast.LENGTH_SHORT).show();
             }
@@ -188,23 +190,6 @@ public class FaceViewActivity extends AppCompatActivity {
         bigImageView.setImageResource(resId);
         bigImageView.setScaleType(ImageView.ScaleType.CENTER);
         bigImageView.setOnClickListener(v -> imageCapture());
-    }
-
-    /**
-     * 保存人脸图片, 缩放原图
-     * @param src_bitmap
-     * @param rect
-     */
-    private Bitmap getFaceImage(Bitmap src_bitmap, Rect rect) {
-        float targetWidth = 400; //目标宽度高度
-        float targetHeight = 400;
-        float scaleWidth = targetWidth / rect.width();
-        float scaleHeight = targetHeight / rect.height();
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-
-        return Bitmap.createBitmap(src_bitmap,
-                rect.left, rect.top, rect.width(), rect.height(), matrix, true);
     }
 
     /**
