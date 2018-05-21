@@ -35,6 +35,7 @@ public class GroupViewActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     EditText dialogGroupCourse;
     EditText dialogGroupName;
+    EditText dialogPhoneNumber;
     ImageButton dialogGroupImageButton;
     private Uri imageFileUri;
     private static final int REQUEST_CODE_IMAGE_CAMERA = 1;
@@ -68,6 +69,7 @@ public class GroupViewActivity extends AppCompatActivity {
 
                 dialogGroupCourse = layout.findViewById(R.id.edit_view_group_course);
                 dialogGroupName = layout.findViewById(R.id.edit_view_group_name);
+                dialogPhoneNumber = layout.findViewById(R.id.edit_view_phone_number);
                 dialogGroupImageButton = layout.findViewById(R.id.group_image_button);
                 dialogGroupImageButton.setOnClickListener(v2 -> {
                     Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
@@ -90,6 +92,7 @@ public class GroupViewActivity extends AppCompatActivity {
                         GroupDB groupDB = new GroupDB();
                         groupDB.setGroupCourse(dialogGroupCourse.getText().toString());
                         groupDB.setGroupName(dialogGroupName.getText().toString());
+                        groupDB.setAdminPhoneNumber(dialogPhoneNumber.getText().toString());
                         groupDB.setGroupImage(groupImageBitmap);
                         groupDB.save();
                         recyclerViewUpdate(); //更新分组列表

@@ -12,8 +12,9 @@ public class GroupDB extends DataSupport {
     private int id;
     private String groupCourse;
     private String groupName;
+    private String adminPhoneNumber;
     private List<Face> faces;
-    private byte[] groupImageData = new byte[0];
+    private byte[] groupImageData;
 
     public GroupDB(){
         faces = new ArrayList<>();
@@ -45,7 +46,7 @@ public class GroupDB extends DataSupport {
     }
 
     public String toString() {
-        return this.getGroupCourse() + ":" + this.getGroupName();
+        return String.format("%s-%s (课-班)", this.getGroupCourse(), this.getGroupName());
     }
 
     public int getId() {
@@ -70,5 +71,13 @@ public class GroupDB extends DataSupport {
 
     public void setGroupImage(Bitmap groupImage) {
         this.setGroupImageData(BitmapHandle.bitmapToByte(groupImage));
+    }
+
+    public String getAdminPhoneNumber() {
+        return adminPhoneNumber;
+    }
+
+    public void setAdminPhoneNumber(String adminPhoneNumber) {
+        this.adminPhoneNumber = adminPhoneNumber;
     }
 }

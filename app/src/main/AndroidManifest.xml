@@ -3,7 +3,8 @@
     package="com.example.fengs.campusattendance">
 
     <uses-permission android:name="android.permission.CAMERA" />
-
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-feature android:name="android.hardware.camera2.full" />
     <!-- sdcard -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

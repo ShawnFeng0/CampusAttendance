@@ -1,8 +1,13 @@
 package com.example.fengs.campusattendance;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -25,6 +30,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.nfc.TagLostException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +42,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -45,6 +53,7 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,6 +81,7 @@ public class ClassActivity extends AppCompatActivity {
     private Button creatNotSignInButton;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -80,6 +90,7 @@ public class ClassActivity extends AppCompatActivity {
     }
 
     private String cameraID_front_or_back;
+    private GroupDB groupDB;
     private RecyclerView recyclerView;
     private SignInFaceAdapter signInFaceAdapter;
 
@@ -107,7 +118,7 @@ public class ClassActivity extends AppCompatActivity {
 
         int group_id = getIntent().getIntExtra("groupID", 0);
         cameraID_front_or_back = getIntent().getStringExtra("camera");
-        GroupDB groupDB = DataSupport.find(GroupDB.class, group_id);
+        groupDB = DataSupport.find(GroupDB.class, group_id);
 
         //列表设置
         recyclerView = findViewById(R.id.sign_in_recyclerView);
@@ -131,30 +142,22 @@ public class ClassActivity extends AppCompatActivity {
         cur_face_name_textView = findViewById(R.id.cur_face_name_text_view);
 
         creatNotSignInButton = findViewById(R.id.create_list_button);
-        creatNotSignInButton.setOnClickListener(v -> {
-            /* 后置相机没有做图像的转换，暂时不可用 */
-            List<String> faceStrings = new ArrayList<>();
-            for (Face face : signInFaceAdapter.getFaceList()) {
-                faceStrings.add(face.getFaceID() + ":" + face.getFaceName());
-            }
-            new AlertDialog.Builder(this)
-                    .setTitle("未签到列表")
-                    .setItems(faceStrings.toArray(new String[faceStrings.size()]), (dialog, which) -> {
-                    })
-                    .show();
-        });
-            faceRecognition = new FaceRecognition(); //人脸跟踪相关
-        }
-        TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        creatNotSignInButton.setOnClickListener(this::onClick);
+        faceRecognition = new FaceRecognition(); //人脸跟踪相关
+    }
+
+    TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             //open your camera here
             openCamera(cameraID_front_or_back);
         }
+
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
             // Transform you image captured size according to the surface width and height
         }
+
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
             return false;
@@ -193,12 +196,12 @@ public class ClassActivity extends AppCompatActivity {
             //图片镜像并旋转90度, 变为正常尺寸 720 480
             matrix.setScale(-1, 1);
             matrix.postTranslate(imgWidth, 0);
-            matrix.postRotate(90, imgWidth/2, imgHeight/2); //旋转90度
-            matrix.postTranslate(0,(imgWidth-imgHeight)/2); //中心对齐
+            matrix.postRotate(90, imgWidth / 2, imgHeight / 2); //旋转90度
+            matrix.postTranslate(0, (imgWidth - imgHeight) / 2); //中心对齐
             matrix.mapRect(realRect); //矩形框进行矩阵变换
 
 //            float scale = textureView.getWidth() / img.getHeight(); // 840 / 480
-            float scale = (float)textureView.getHeight() / img.getWidth(); // 1302 / 720
+            float scale = (float) textureView.getHeight() / img.getWidth(); // 1302 / 720
             matrix.reset(); //新变换
             matrix.postTranslate((textureView.getWidth() - 720) / 2,
                     (textureView.getHeight() - 720) / 2);  //参考参数: matrix.postTranslate((840 - 720) / 2, (1302 - 720) / 2);
@@ -227,6 +230,117 @@ public class ClassActivity extends AppCompatActivity {
         img.close(); //释放图片内存
     }
 
+    private void onClick(View v) {
+        List<String> faceStrings = new ArrayList<>();
+        for (Face face : signInFaceAdapter.getFaceList()) {
+            faceStrings.add(String.format("学号: %s, 姓名:%s", face.getFaceID(), face.getFaceName()));
+        }
+        if (faceStrings.size() == 0) {
+            faceStrings.add("今天全体人员都到齐了哦!");
+        }
+//        String[] faceStringsArray = faceStrings.toArray(new String[faceStrings.size()]);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("未签到人员信息:")
+                .setItems(faceStrings.toArray(new String[faceStrings.size()]), (dialog1, which) -> {
+                })
+                .setPositiveButton("发送短信", null)
+                .setNegativeButton("取消", null)
+                .show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((View v1) -> {
+            final View layout = getLayoutInflater().inflate(R.layout.dialog_send_sms, null);
+            EditText editTextPhone = layout.findViewById(R.id.edit_view_phone_number_for_send);
+            EditText editTextComment = layout.findViewById(R.id.edit_view_comment_to_send);
+            String phoneNumber = groupDB.getAdminPhoneNumber();
+            if (phoneNumber == null || phoneNumber.isEmpty()) {
+                TelephonyManager tm = (TelephonyManager) this.getSystemService(getApplication().TELEPHONY_SERVICE);
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                phoneNumber = tm.getLine1Number();
+            }
+            editTextPhone.setText(phoneNumber);
+            new AlertDialog.Builder(this)
+                    .setTitle("发送未签到人员短信到:")
+                    .setView(layout)
+                    .setPositiveButton("发送", (dialog13, which) -> {
+                        StringBuilder sendString = new StringBuilder();
+                        sendString.append(editTextComment.getText().toString()).append("\n");
+                        sendString.append("未签到学生信息:").append("\n");
+                        for (String string : faceStrings) {
+                            sendString.append(string).append("\n");
+                        }
+                        sendSMS(editTextPhone.getText().toString(), sendString.toString());
+                        dialog.dismiss();
+                    })
+                    .setNegativeButton("取消", (dialog12, which) -> {
+                        dialog.dismiss();
+                    })
+                    .show();
+        });
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v1 -> dialog.dismiss());
+    }
+
+    /**
+     * 直接调用短信接口发短信，不含发送报告和接受报告
+     *
+     * @param phoneNumber
+     * @param message
+     */
+    private void sendSMS(String phoneNumber, String message) {
+        Context context = ClassActivity.this;
+        //处理返回的发送状态
+        String SENT_SMS_ACTION = "SENT_SMS_ACTION";
+        Intent sentIntent = new Intent(SENT_SMS_ACTION);
+        PendingIntent sendIntent= PendingIntent.getBroadcast(context, 0, sentIntent,
+                0);
+        // register the Broadcast Receivers
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context _context, Intent _intent) {
+                switch (getResultCode()) {
+                    case Activity.RESULT_OK:
+                        Toast.makeText(context,
+                                "短信发送成功", Toast.LENGTH_SHORT)
+                                .show();
+                        break;
+                    case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                        break;
+                    case SmsManager.RESULT_ERROR_RADIO_OFF:
+                        break;
+                    case SmsManager.RESULT_ERROR_NULL_PDU:
+                        break;
+                }
+            }
+        }, new IntentFilter(SENT_SMS_ACTION));
+
+        //处理返回的接收状态
+        String DELIVERED_SMS_ACTION = "DELIVERED_SMS_ACTION";
+        // create the deilverIntent parameter
+        Intent deliverIntent = new Intent(DELIVERED_SMS_ACTION);
+        PendingIntent backIntent= PendingIntent.getBroadcast(context, 0,
+                deliverIntent, 0);
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context _context, Intent _intent) {
+                Toast.makeText(context,
+                        "收信人已经成功接收", Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }, new IntentFilter(DELIVERED_SMS_ACTION));
+
+        // 获取短信管理器
+        SmsManager smsManager = SmsManager.getDefault();
+        if (message.length() > 70) {
+            ArrayList<String> msgs = smsManager.divideMessage(message);
+            ArrayList<PendingIntent> sentIntents = new ArrayList<>();
+            for(int i = 0;i<msgs.size();i++){
+                sentIntents.add(sendIntent);
+            }
+            smsManager.sendMultipartTextMessage(phoneNumber, null, msgs, sentIntents, null);
+        } else {
+            smsManager.sendTextMessage(phoneNumber, null, message, sendIntent, backIntent);
+        }
+    }
     private class DrawRectTask extends AsyncTask<Object, Void, Face> {
 
         @Override
@@ -271,11 +385,12 @@ public class ClassActivity extends AppCompatActivity {
                 current_face_imageView.setAlpha(1.0f);
                 cur_face_name_textView.setAlpha(1.0f);
                 cur_face_name_textView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-                cur_face_name_textView.setText(String.format("%s:%s", face.getFaceID(), face.getFaceName()));
+                cur_face_name_textView.setText(String.format("%s:%s签到成功!", face.getFaceID(), face.getFaceName()));
                 recyclerView.scrollToPosition(faceIndex);
                 signInFaceAdapter.removeDataDelayToDisplay(faceIndex);
+                current_face_imageView.removeCallbacks(currentFaceImageHide);
             } else {
-                current_face_imageView.postDelayed(currentFaceImageHide, 3000);
+                current_face_imageView.postDelayed(currentFaceImageHide, 2000);
             }
         }
     }
@@ -283,8 +398,8 @@ public class ClassActivity extends AppCompatActivity {
     Runnable currentFaceImageHide = new Runnable() {
         @Override
         public void run() {
-            current_face_imageView.setAlpha(0.1f);
-            cur_face_name_textView.setAlpha(0.1f);
+            current_face_imageView.setAlpha(0.0f);
+            cur_face_name_textView.setAlpha(0.0f);
             cur_face_name_textView.setText("");
         }
     };

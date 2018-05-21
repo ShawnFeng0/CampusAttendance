@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button button_classes_begin;
     private List<GroupDB> groupDBList;
     private GroupDB selectGroupDB;
-    private Uri imageFileUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra("groupID", selectGroupDB.getId());
                 intent.putExtra("camera", "front");
                 startActivity(intent);
-
 //                /* 后置相机没有做图像的转换，暂时不可用 */
 //                new AlertDialog.Builder(this)
 //                        .setTitle("请选择相机")
