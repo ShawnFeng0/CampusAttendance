@@ -120,9 +120,10 @@ public class FaceViewActivity extends AppCompatActivity {
                 canvas.drawRect(rect, paint);
 
                 AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(bitmap_data, bitmap.getWidth(), bitmap.getHeight(), faceRect.getRect(), faceRect.getDegree());
+                Log.i(TAG, String.format("onActivityResult: faceFeature: %x", faceFeature.getFeatureData()[0]));
                 Log.i(TAG, "faceInfo: " + faceRect.toString());
 
-                if (faceFeature.getFeatureData().length > 0) {
+                if (faceFeature.getFeatureData()[0] != 0xaf) {
                     //弹出添加人脸的窗口
                     LayoutInflater inflater = getLayoutInflater();
                     final View layout = inflater.inflate(R.layout.dialog_add_face, null);

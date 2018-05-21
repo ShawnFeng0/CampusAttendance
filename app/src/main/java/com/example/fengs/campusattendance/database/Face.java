@@ -12,8 +12,8 @@ public class Face extends DataSupport{
     private GroupDB groupDB;
     private String faceName;
     private String faceID;
-    private byte[] featureData = new byte[0];
-    private byte[] faceImageData = new byte[0];
+    private byte[] featureData;
+    private byte[] faceImageData;
 
     private byte[] getFaceImageData() {
         return faceImageData;

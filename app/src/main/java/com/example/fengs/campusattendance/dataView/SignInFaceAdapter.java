@@ -69,12 +69,17 @@ public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.Vi
     }
 
     @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        super.onBindViewHolder(holder, position, payloads);
+    }
+
+    @Override
     public int getItemCount() {
         return faceList.size();
     }
 
-    public void removeDataDelayToDisplay(int position, long delayMillisToDisplay) {
+    public void removeDataDelayToDisplay(int position) {
         faceList.remove(position);
-        new Handler().postDelayed(() -> notifyItemRemoved(position), delayMillisToDisplay);
+        notifyItemRemoved(position);
     }
 }
