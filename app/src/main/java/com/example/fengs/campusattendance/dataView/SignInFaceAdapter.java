@@ -1,5 +1,6 @@
 package com.example.fengs.campusattendance.dataView;
 
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.example.fengs.campusattendance.database.Face;
 import java.util.List;
 
 public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.ViewHolder> {
+
     private List<Face> faceList;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -31,9 +33,16 @@ public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.Vi
     }
 
     public SignInFaceAdapter(List<Face> faceDBLt) {
-        faceList = faceDBLt;
+         setFaceList(faceDBLt);
     }
 
+    public List<Face> getFaceList() {
+        return faceList;
+    }
+
+    private void setFaceList(List<Face> faceList) {
+        this.faceList = faceList;
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -48,12 +57,7 @@ public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.Vi
                     "学号: " + face.getFaceID() + "  " + "姓名: " + face.getFaceName(), Toast.LENGTH_SHORT).show();
         });
 
-        viewHolder.faceView.setOnLongClickListener(v -> {
-            final int position = viewHolder.getAdapterPosition();
-            final Face face = faceList.get(position);
-
-            return true;
-        });
+        viewHolder.faceView.setOnLongClickListener(v -> false); //返回false 就会执行短按的内容, 返回true则不会
         return viewHolder;
     }
 
@@ -69,8 +73,8 @@ public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.Vi
         return faceList.size();
     }
 
-    private void removeData(int position) {
+    public void removeDataDelayToDisplay(int position, long delayMillisToDisplay) {
         faceList.remove(position);
-        notifyItemRemoved(position);
+        new Handler().postDelayed(() -> notifyItemRemoved(position), delayMillisToDisplay);
     }
 }

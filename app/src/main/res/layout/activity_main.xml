@@ -82,11 +82,11 @@
         android:layout_marginEnd="27dp"
         android:layout_marginStart="27dp"
         android:layout_marginTop="16dp"
-        android:background="@android:color/darker_gray"
+        android:background="#eeeeee"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:srcCompat="@android:color/darker_gray" />
+        app:srcCompat="@drawable/book_default" />
 
 </android.support.constraint.ConstraintLayout>

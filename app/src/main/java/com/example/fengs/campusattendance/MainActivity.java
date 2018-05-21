@@ -100,20 +100,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button_classes_begin: {
-                new AlertDialog.Builder(this)
-                        .setTitle("请选择相机")
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .setItems(new String[]{"后置相机", "前置相机"}, (dialog, which) -> {
-                            Intent intent = new Intent(MainActivity.this, ClassActivity.class);
-                            intent.putExtra("groupID", selectGroupDB.getId());
-                            if (which == 0) {
-                                intent.putExtra("camera", "back");
-                            } else {
-                                intent.putExtra("camera", "front");
-                            }
-                            startActivity(intent);
-                        })
-                        .show();
+                Intent intent = new Intent(MainActivity.this, ClassActivity.class);
+                intent.putExtra("groupID", selectGroupDB.getId());
+                intent.putExtra("camera", "front");
+                startActivity(intent);
+
+//                /* 后置相机没有做图像的转换，暂时不可用 */
+//                new AlertDialog.Builder(this)
+//                        .setTitle("请选择相机")
+//                        .setIcon(android.R.drawable.ic_dialog_info)
+//                        .setItems(new String[]{"后置相机", "前置相机"}, (dialog, which) -> {
+//                            Intent intent = new Intent(MainActivity.this, ClassActivity.class);
+//                            intent.putExtra("groupID", selectGroupDB.getId());
+//                            if (which == 0) {
+//                                intent.putExtra("camera", "back");
+//                            } else {
+//                                intent.putExtra("camera", "front");
+//                            }
+//                            startActivity(intent);
+//                        })
+//                        .show();
             }
         }
     }

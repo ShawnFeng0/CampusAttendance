@@ -40,11 +40,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arcsoft.facedetection.AFD_FSDKFace;
@@ -66,6 +68,7 @@ public class ClassActivity extends AppCompatActivity {
     private TextureView textureView;
     private SurfaceView surfaceView;
     private ImageView current_face_imageView;
+    private TextView cur_face_name_textView;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -76,7 +79,7 @@ public class ClassActivity extends AppCompatActivity {
     private GroupDB groupDB;
     private String cameraID_front_or_back;
     private RecyclerView recyclerView;
-    private List<Face> faceList;
+    private SignInFaceAdapter signInFaceAdapter;
 
     protected CameraDevice cameraDevice;
     protected CameraCaptureSession cameraCaptureSessions;
@@ -113,7 +116,8 @@ public class ClassActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        recycleViewUpdate();
+        signInFaceAdapter = new SignInFaceAdapter(groupDB.getFaces());
+        recyclerView.setAdapter(signInFaceAdapter);
 
         surfaceView = findViewById(R.id.canvas_surfaceView);
         surfaceView.setZOrderOnTop(true);
@@ -123,8 +127,8 @@ public class ClassActivity extends AppCompatActivity {
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
 
-
         current_face_imageView = findViewById(R.id.current_face_imageView);
+        cur_face_name_textView = findViewById(R.id.cur_face_name_text_view);
 
         faceRecognition = new FaceRecognition(); //人脸跟踪相关
     }
@@ -163,7 +167,6 @@ public class ClassActivity extends AppCompatActivity {
 
     private void onImageAvailable(ImageReader reader) {
 
-        long time = System.currentTimeMillis();
         Image img = reader.acquireLatestImage();
         int imgWidth = img.getWidth();
         int imgHeight = img.getHeight();
@@ -171,17 +174,15 @@ public class ClassActivity extends AppCompatActivity {
         preview_image_data = ImageUtil.getBytesFromImageAsType(img, ImageUtil.NV21);
         List<AFT_FSDKFace> result = faceRecognition.FaceTrackingProcess(preview_image_data, imgWidth, imgHeight);
 
+        /* 第一次运行 或 上次任务已经结束  注意每次需new一个实例,新建的任务只能执行一次,否则会出现异常 */
+        if (drawRectTask == null || drawRectTask.getStatus() != AsyncTask.Status.RUNNING) {
+            drawRectTask = new DrawRectTask();
+            drawRectTask.execute(preview_image_data, imgWidth, imgHeight, !result.isEmpty());
+        }
+
         if (!result.isEmpty()) {
 
             AFT_FSDKFace faceInfo = FaceRecognition.getMaxFace_AFT(result);
-            Log.i(TAG, "faceInfo: " + faceInfo.toString());
-
-            /* 第一次运行 或 上次任务已经结束  注意每次需new一个实例,新建的任务只能执行一次,否则会出现异常 */
-            if (drawRectTask == null || drawRectTask.getStatus() != AsyncTask.Status.RUNNING) {
-                drawRectTask = new DrawRectTask();
-                drawRectTask.execute(preview_image_data, imgWidth, imgHeight, faceInfo);
-            }
-
             RectF realRect = new RectF(faceInfo.getRect());
             Matrix matrix = new Matrix();
 
@@ -220,7 +221,6 @@ public class ClassActivity extends AppCompatActivity {
             surfaceView.getHolder().unlockCanvasAndPost(rect_canvas);
         }
         img.close(); //释放图片内存
-        Log.i(TAG, "人脸跟踪时间: " + (System.currentTimeMillis() - time));
     }
 
     private void backup_onImageAvailable(ImageReader reader) {
@@ -300,32 +300,33 @@ public class ClassActivity extends AppCompatActivity {
 
         @Override
         protected Face doInBackground(Object... Objects) {
-            long time = System.currentTimeMillis();
             byte [] imageByte = (byte[]) Objects[0];
             Face resultFace = null;
             int imgWidth = (int) Objects[1];
             int imgHeight = (int) Objects[2];
-//            AFT_FSDKFace faceInfo = (AFT_FSDKFace) Objects[3];
+            boolean hasResult = (boolean) Objects[3];
 
 //            imageByte = Bmp2YUV.getNV21(textureView.getWidth(), textureView.getHeight(), textureView.getBitmap());
 //            int imgWidth = textureView.getWidth();
 //            int imgHeight = textureView.getHeight();
-            List<AFD_FSDKFace> result = FaceRecognition.singleFaceDetection(imageByte, imgWidth, imgHeight);
 
-            if (!result.isEmpty()) {
-                AFD_FSDKFace faceInfo = FaceRecognition.getMaxFace_AFD(result);
-                AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(imageByte, imgWidth, imgHeight, faceInfo.getRect(), faceInfo.getDegree());
-                AFR_FSDKFace registeredFaceFeature = new AFR_FSDKFace();
-                int i = 0;
-                float maxScore = 0;
-                for (Face face : faceList) {
-                    registeredFaceFeature.setFeatureData(face.getFeatureData());
-                    float score = FaceRecognition.singleFaceMatching(registeredFaceFeature, faceFeature);
-                    if (score > maxScore) {
-                        maxScore = score;
-                        resultFace = face;
+            if (hasResult) {
+                List<AFD_FSDKFace> result = FaceRecognition.singleFaceDetection(imageByte, imgWidth, imgHeight);
+                if (!result.isEmpty()) {
+                    AFD_FSDKFace faceInfo = FaceRecognition.getMaxFace_AFD(result);
+                    AFR_FSDKFace faceFeature = FaceRecognition.singleGetFaceFeature(imageByte, imgWidth, imgHeight, faceInfo.getRect(), faceInfo.getDegree());
+                    AFR_FSDKFace registeredFaceFeature = new AFR_FSDKFace();
+                    float maxScore = 0.6f; //相似度确认最小阈值
+                    for (Face face : signInFaceAdapter.getFaceList()) {
+                        registeredFaceFeature.setFeatureData(face.getFeatureData());
+                        float score = FaceRecognition.singleFaceMatching(registeredFaceFeature, faceFeature);
+                        if (score > maxScore) {
+                            maxScore = score;
+                            resultFace = face;
+                        }
+                        Log.i(TAG, "名字：" + face.getFaceName() +  "   SCORE: " + score);
                     }
-                    Log.i(TAG, "SCORE" + (i++) + ": " + score);
+                    Log.i(TAG, "------------------------------------------------------------------");
                 }
             }
             return resultFace;
@@ -334,15 +335,36 @@ public class ClassActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Face face) {
             super.onPostExecute(face);
-//            if (bitmap != null) {
-//                current_face_imageView.setImageBitmap(bitmap);
-//            } else {
-//                current_face_imageView.setAlpha(0.1f);
-
-//            }
+            int faceIndex = signInFaceAdapter.getFaceList().indexOf(face);
+            if (face != null) {
+                if (mBackgroundHandler != null) {
+                    mBackgroundHandler.removeCallbacks(currentFaceImageHide);
+                }
+//                faceList.indexOf(face);
+//                faceList.remove(face);
+                current_face_imageView.setImageBitmap(face.getFaceImage());
+                current_face_imageView.setAlpha(1.0f);
+                cur_face_name_textView.setAlpha(1.0f);
+                cur_face_name_textView.setText(String.format("%s:%s", face.getFaceID(), face.getFaceName()));
+                recyclerView.smoothScrollToPosition(faceIndex);
+                signInFaceAdapter.removeDataDelayToDisplay(faceIndex, 1000);
+            } else {
+                current_face_imageView.postDelayed(currentFaceImageHide, 2000);
+            }
         }
     }
 
+    Runnable currentFaceImageHide = new Runnable() {
+        @Override
+        public void run() {
+//            mTextView.setAlpha(0.5f);
+//            current_face_imageView.setImageResource();
+            current_face_imageView.setAlpha(0.5f);
+//            current_face_imageView.setImageResource(android.R.color.darker_gray);
+            cur_face_name_textView.setText("");
+            cur_face_name_textView.setAlpha(0.5f);
+        }
+    };
 
     private final CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
@@ -381,16 +403,6 @@ public class ClassActivity extends AppCompatActivity {
         }
 
     };
-
-    /**
-     * 更新显示列表
-     */
-    private void recycleViewUpdate() {
-        faceList = groupDB.getFaces();
-        final SignInFaceAdapter adapter = new SignInFaceAdapter(faceList);
-        recyclerView.setAdapter(adapter);
-        Toast.makeText(this, "人数: " + faceList.size(), Toast.LENGTH_SHORT).show();
-    }
 
     protected void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("Camera Background");
@@ -643,12 +655,25 @@ public class ClassActivity extends AppCompatActivity {
         stopBackgroundThread();
         super.onPause();
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (faceRecognition != null) {
             faceRecognition.FinishFaceTracking();
         }
+    }
+
+    /**
+     * 菜单选项
+     * @param item
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: //左上角返回键
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
