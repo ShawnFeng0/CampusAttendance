@@ -19,16 +19,20 @@ import java.util.List;
 
 public class FaceRecognition {
 
+    /* 从虹软申请到的人脸识别库的申请码 */
     private static String APPID = "FT6NUE7YNUTpsY8MU9MsYoDbznky3HGTCfrnZBkcgGtJ";
     private static String FT_KEY = "E2gjivyni7Cs54McJ2rvCjGZfKdBUZpPmxrvf89sU2bq";
 	private static String FD_KEY = "E2gjivyni7Cs54McJ2rvCjGgpitJU6fLsKfvHxSBJLHm";
 	private static String FR_KEY = "E2gjivyni7Cs54McJ2rvCjH4JvfqjsHSqzBenDLwSPG8";
-    private static String AGE_KEY = "E2gjivyni7Cs54McJ2rvCjHRo8TLy5zMstBKouonKTqx";
-    private static String GENDER_KEY = "E2gjivyni7Cs54McJ2rvCjHYxXiWSQDYq1XW5TpG8UQh";
-    AFT_FSDKEngine AFT_engine;
-    AFT_FSDKError AFT_err;
+//    private static String AGE_KEY = "E2gjivyni7Cs54McJ2rvCjHRo8TLy5zMstBKouonKTqx";
+//    private static String GENDER_KEY = "E2gjivyni7Cs54McJ2rvCjHYxXiWSQDYq1XW5TpG8UQh";
+    private AFT_FSDKEngine AFT_engine;
+    private AFT_FSDKError AFT_err;
 
-    public FaceRecognition() {
+    /**
+     * 初始化人脸跟踪引擎
+     */
+    FaceRecognition() {
         AFT_engine = new AFT_FSDKEngine();
 
         //初始化人脸跟踪引擎，使用时请替换申请的APPID和SDKKEY
@@ -37,6 +41,13 @@ public class FaceRecognition {
 
     }
 
+    /**
+     * 人脸跟踪处理
+     * @param data NV21格式图片数据流
+     * @param width 图片宽
+     * @param height 图片高
+     * @return 人脸矩形列表
+     */
     public List<AFT_FSDKFace> FaceTrackingProcess(byte[] data, int width, int height) {
 
         // 用来存放检测到的人脸信息列表
@@ -53,12 +64,21 @@ public class FaceRecognition {
         return result;
     }
 
+    /**
+     * 销毁人脸跟踪引擎
+     */
     public void FinishFaceTracking() {
-        //销毁人脸跟踪引擎
         AFT_err = AFT_engine.AFT_FSDK_UninitialFaceEngine();
         Log.d("com.arcsoft", "AFT_FSDK_UninitialFaceEngine =" + AFT_err.getCode());
     }
 
+    /**
+     * 单次人脸检测
+     * @param data NV21格式图片字节流
+     * @param width 宽度
+     * @param height 高度
+     * @return 返回识别到的所有人脸矩形信息
+     */
     public static List<AFD_FSDKFace> singleFaceDetection(byte[] data, int width, int height) {
         AFD_FSDKEngine engine = new AFD_FSDKEngine();
 
@@ -84,6 +104,15 @@ public class FaceRecognition {
         return result;
     }
 
+    /**
+     * 单次提取人脸特征信息
+     * @param data NV21格式图片字节流
+     * @param width 图片宽
+     * @param height 图片高
+     * @param faceRect 人脸矩形位置, 从人脸检测返回的信息
+     * @param faceDegree 人脸角度, 从人脸检测返回的信息
+     * @return 返回人脸特征信息
+     */
     public static AFR_FSDKFace singleGetFaceFeature(byte[] data, int width, int height, Rect faceRect, int faceDegree) {
         AFR_FSDKEngine engine = new AFR_FSDKEngine();
 
@@ -107,9 +136,9 @@ public class FaceRecognition {
 
     /**
      * 对比人脸信息
-     * @param face1
-     * @param face2
-     * @return
+     * @param face1 人脸数据
+     * @param face2 人脸数据
+     * @return 匹配度: 0.0 - 1.0
      */
     public static float singleFaceMatching(AFR_FSDKFace face1, AFR_FSDKFace face2) {
         AFR_FSDKEngine engine = new AFR_FSDKEngine();
@@ -131,6 +160,11 @@ public class FaceRecognition {
         return score.getScore();
     }
 
+    /**
+     * 得到最大的矩形 人脸识别得到的矩形框
+     * @param result 人脸矩形列表
+     * @return 找到的最大的矩形
+     */
     public static AFD_FSDKFace getMaxFace_AFD(List<AFD_FSDKFace> result) {
 
         int area_t;
@@ -152,6 +186,11 @@ public class FaceRecognition {
         return face_max;
     }
 
+    /**
+     * 得到最大的矩形 人脸跟踪识别到的矩形框
+     * @param result 人脸矩形列表
+     * @return 找到的最大的矩形
+     */
     public static AFT_FSDKFace getMaxFace_AFT(List<AFT_FSDKFace> result) {
 
         int area_t;

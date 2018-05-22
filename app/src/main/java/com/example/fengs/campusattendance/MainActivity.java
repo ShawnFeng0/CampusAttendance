@@ -23,41 +23,40 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private Spinner groupSpinner;
-    private ImageView groupBigImage;
-    private Button button_classes_begin;
-    private List<GroupDB> groupDBList;
-    private GroupDB selectGroupDB;
+    private Spinner groupSpinner; //分组选择框
+    private ImageView groupBigImage; //课程图片
+    private GroupDB selectGroupDB; //当前选择的分组
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setSupportActionBar(findViewById(R.id.toolbar));
+        setContentView(R.layout.activity_main); //设置对应的布局
+        setSupportActionBar(findViewById(R.id.toolbar)); //设置工具栏
 
-        groupSpinner = findViewById(R.id.group_select_spinner);
-        groupBigImage = findViewById(R.id.group_big_image_view);
-        button_classes_begin = findViewById(R.id.button_classes_begin);
-        button_classes_begin.setOnClickListener(this);
+        groupSpinner = findViewById(R.id.group_select_spinner); //对应的选择框
+        groupBigImage = findViewById(R.id.group_big_image_view); //对应的课程图浏览
+        Button button_classes_begin = findViewById(R.id.button_classes_begin); //对应的按钮
+        button_classes_begin.setOnClickListener(this); //按键动作监听
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        groupDBList = DataSupport.findAll(GroupDB.class);
+        List<GroupDB> groupDBList = DataSupport.findAll(GroupDB.class); //返回主界面之后重新获取分组的列表
         ArrayAdapter<GroupDB> arrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, groupDBList);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); //设置下拉的样式
         groupSpinner.setAdapter(arrayAdapter);
+
+        //选项选择之后的动作监听
         groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                  selectGroupDB = (GroupDB) parent.getItemAtPosition(position);
-                 if (selectGroupDB.getGroupImage() != null) {
+                 if (selectGroupDB.getGroupImage() != null) { //设置课程图
                      groupBigImage.setImageBitmap(selectGroupDB.getGroupImage());
-                 } else {
+                 } else { //没有就设置默认的图
                      groupBigImage.setImageResource(R.drawable.book_default);
                  }
             }
@@ -69,27 +68,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    /**
-     * 创建右上角菜单
-     * @param menu
-     * @return
-     */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_toolbar, menu);
+    public boolean onCreateOptionsMenu(Menu menu) { //设置选项菜单
+        getMenuInflater().inflate(R.menu.main_toolbar, menu); //设置对应工具栏
         return true;
     }
 
-    /**
-     * 菜单选项
-     * @param item
-     * @return
-     */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) { //工具栏选项点击后的动作
         switch (item.getItemId()) {
-            case R.id.view_group:
-                Intent intent = new Intent(MainActivity.this, GroupViewActivity.class);
+            case R.id.view_group: //查看分组
+                Intent intent = new Intent(MainActivity.this, GroupViewActivity.class); //进入分组视图
                 startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
@@ -98,11 +87,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.button_classes_begin: {
+            case R.id.button_classes_begin: { //开始签到
                 Intent intent = new Intent(MainActivity.this, ClassActivity.class);
-                intent.putExtra("groupID", selectGroupDB.getId());
-                intent.putExtra("camera", "front");
+                intent.putExtra("groupID", selectGroupDB.getId()); //传递分组信息
+                intent.putExtra("camera", "front"); //使用前置摄像头
                 startActivity(intent);
+
 //                /* 后置相机没有做图像的转换，暂时不可用 */
 //                new AlertDialog.Builder(this)
 //                        .setTitle("请选择相机")

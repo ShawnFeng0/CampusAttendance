@@ -43,6 +43,7 @@ public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.Vi
     private void setFaceList(List<Face> faceList) {
         this.faceList = faceList;
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -79,7 +80,7 @@ public class SignInFaceAdapter extends RecyclerView.Adapter<SignInFaceAdapter.Vi
     }
 
     public void removeDataDelayToDisplay(int position) {
-        faceList.remove(position);
-        notifyItemRemoved(position);
+        faceList.remove(position); //从列表中移除
+        notifyItemRemoved(position); //通知该位置被移除
     }
 }
