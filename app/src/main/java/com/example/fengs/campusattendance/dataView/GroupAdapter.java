@@ -15,14 +15,16 @@ import com.example.fengs.campusattendance.database.GroupDB;
 import org.litepal.crud.DataSupport;
 
 import java.util.List;
-
+/**
+ * recyclerView组信息显示适配器
+ */
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
-    private List<GroupDB> groupDBList;
+    private List<GroupDB> groupDBList; //组列表
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView groupName;
-        TextView groupCount;
-        View groupView;
+        TextView groupName; //组名 group.toString()
+        TextView groupCount; //组内人数显示
+        View groupView; //包含以上两个视图
 
         ViewHolder(View view) {
             super(view);
@@ -33,47 +35,38 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     }
 
     GroupAdapter(List<GroupDB> gDBLt) {
-        groupDBList = gDBLt;
+        groupDBList = gDBLt; //初始化得到组列表
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.group_item, parent, false);
+                .inflate(R.layout.group_item, parent, false); //得到组显示的视图
         final ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.groupView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = viewHolder.getAdapterPosition();
-                GroupDB groupDB = groupDBList.get(position);
-                ((GroupViewActivity)(parent.getContext())).faceView(groupDB); //进入人脸界面
-            }
+
+        /* 短按进入人脸界面 */
+        viewHolder.groupView.setOnClickListener(v -> {
+            int position = viewHolder.getAdapterPosition(); //得到当前位置
+            GroupDB groupDB = groupDBList.get(position); //得到当前组信息
+            ((GroupViewActivity)(parent.getContext())).faceView(groupDB); //进入人脸界面, 传递选中的组信息
         });
-        viewHolder.groupView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                final int position = viewHolder.getAdapterPosition();
-                final GroupDB groupDB = groupDBList.get(position);
-                AlertDialog.Builder dialog = new AlertDialog.Builder(v.getContext());
-                dialog.setMessage("确认删除：" + groupDB.getGroupCourse() + "_" + groupDB.getGroupName() + "?");
-                dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        removeData(position);
-                        dialog.dismiss();
-                    }
-                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
 
-                return true;
-            }
+        /* 长按删除 */
+        viewHolder.groupView.setOnLongClickListener(v -> {
+            final int position = viewHolder.getAdapterPosition();
+            final GroupDB groupDB = groupDBList.get(position);
 
+            //弹出删除窗口
+            AlertDialog.Builder dialog = new AlertDialog.Builder(v.getContext());
+            dialog.setMessage(String.format("确认删除：%s?", groupDB.toString()));
+            dialog.setPositiveButton("确定", (dialog1, which) -> {
+                removeData(position); //删除当前数据
+                dialog1.dismiss();
+            }).setNegativeButton("取消", (dialog12, which) -> dialog12.dismiss());
+            dialog.show();
+
+            return true;
         });
         return viewHolder;
     }
@@ -90,10 +83,14 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         return groupDBList.size();
     }
 
+    /**
+     * 删除数据
+     * @param position 删除的位置
+     */
     private void removeData(int position) {
-        DataSupport.delete(GroupDB.class, groupDBList.get(position).getId());
-        groupDBList.remove(position);
-        notifyItemRemoved(position);
+        DataSupport.delete(GroupDB.class, groupDBList.get(position).getId()); //从数据库删除
+        groupDBList.remove(position); //从数据列表中删除
+        notifyItemRemoved(position); //刷新当前的位置的数据, 并显示动画
     }
 
 }

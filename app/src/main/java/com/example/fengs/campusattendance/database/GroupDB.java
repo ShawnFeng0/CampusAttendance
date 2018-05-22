@@ -9,34 +9,35 @@ import java.util.List;
 
 
 public class GroupDB extends DataSupport {
-    private int id;
-    private String groupCourse;
-    private String groupName;
-    private String adminPhoneNumber;
-    private List<Face> faces;
-    private byte[] groupImageData;
+    private int id; //数据库内部储存ID
+    private String groupCourseStr; //课程名
+    private String groupClassStr; //班级名
+    private String adminPhoneNumberStr; //管理员电话号码
+    private List<Face> faces; //人脸数据
+    private byte[] groupImageData; //课程图片数据
 
     public GroupDB(){
         faces = new ArrayList<>();
     }
 
-    public String getGroupCourse() {
-        return groupCourse;
+    public String getGroupCourseStr() {
+        return groupCourseStr;
     }
 
-    public void setGroupCourse(String groupCourse) {
-        this.groupCourse = groupCourse;
+    public void setGroupCourseStr(String groupCourseStr) {
+        this.groupCourseStr = groupCourseStr;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public String getGroupClassStr() {
+        return groupClassStr;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setGroupClassStr(String groupClassStr) {
+        this.groupClassStr = groupClassStr;
     }
 
     public List<Face> getFaces() {
+        /* 从数据库读取该组的人脸数据 */
         List<Face> faceList = DataSupport.where("groupdb_id = ?", String.valueOf(id)).find(Face.class);
         if (faceList.size() != 0) {
             return faces = faceList;
@@ -45,8 +46,12 @@ public class GroupDB extends DataSupport {
         }
     }
 
+    /**
+     * 得到组字符串表达信息
+     */
+    @Override
     public String toString() {
-        return String.format("%s-%s (课-班)", this.getGroupCourse(), this.getGroupName());
+        return String.format("%s-%s (课-班)", this.getGroupCourseStr(), this.getGroupClassStr());
     }
 
     public int getId() {
@@ -73,11 +78,11 @@ public class GroupDB extends DataSupport {
         this.setGroupImageData(BitmapHandle.bitmapToByte(groupImage));
     }
 
-    public String getAdminPhoneNumber() {
-        return adminPhoneNumber;
+    public String getAdminPhoneNumberStr() {
+        return adminPhoneNumberStr;
     }
 
-    public void setAdminPhoneNumber(String adminPhoneNumber) {
-        this.adminPhoneNumber = adminPhoneNumber;
+    public void setAdminPhoneNumberStr(String adminPhoneNumberStr) {
+        this.adminPhoneNumberStr = adminPhoneNumberStr;
     }
 }

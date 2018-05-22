@@ -22,7 +22,7 @@
             android:id="@+id/edit_view_group_course"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="如:信号与系统"
+            android:hint="(必填)信号与系统"
             android:maxLength="10"
             android:singleLine="true" />
     </LinearLayout>
@@ -41,10 +41,10 @@
             android:textAlignment="viewEnd" />
 
         <EditText
-            android:id="@+id/edit_view_group_name"
+            android:id="@+id/edit_view_group_class"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="142027X"
+            android:hint="(必填)142027X"
             android:maxLength="10"
             android:singleLine="true" />
     </LinearLayout>
@@ -59,14 +59,14 @@
         <TextView
             android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:text="管理员电话: "
+            android:text="教师电话: "
             android:textAlignment="viewEnd" />
 
         <EditText
             android:id="@+id/edit_view_phone_number"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="139xxxxxxxx"
+            android:hint="(可选)13912345678"
             android:maxLength="11"
             android:singleLine="true" />
     </LinearLayout>
@@ -92,8 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="添加书籍照片"
-            android:textAlignment="center" />
+            android:text="(可选)书籍照片" />
 
     </LinearLayout>
 

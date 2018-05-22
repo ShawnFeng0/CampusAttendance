@@ -30,7 +30,6 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.nfc.TagLostException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -236,7 +235,7 @@ public class ClassActivity extends AppCompatActivity {
             faceStrings.add(String.format("学号: %s, 姓名:%s", face.getFaceID(), face.getFaceName()));
         }
         if (faceStrings.size() == 0) {
-            faceStrings.add("今天全体人员都到齐了哦!");
+            faceStrings.add("今天全体都到齐了哦!");
         }
 //        String[] faceStringsArray = faceStrings.toArray(new String[faceStrings.size()]);
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -250,7 +249,7 @@ public class ClassActivity extends AppCompatActivity {
             final View layout = getLayoutInflater().inflate(R.layout.dialog_send_sms, null);
             EditText editTextPhone = layout.findViewById(R.id.edit_view_phone_number_for_send);
             EditText editTextComment = layout.findViewById(R.id.edit_view_comment_to_send);
-            String phoneNumber = groupDB.getAdminPhoneNumber();
+            String phoneNumber = groupDB.getAdminPhoneNumberStr();
             if (phoneNumber == null || phoneNumber.isEmpty()) {
                 TelephonyManager tm = (TelephonyManager) this.getSystemService(getApplication().TELEPHONY_SERVICE);
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {

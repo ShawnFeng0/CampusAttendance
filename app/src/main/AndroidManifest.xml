@@ -29,7 +29,6 @@
         <activity android:name=".dataView.FaceViewActivity" />
         <activity android:name=".dataView.GroupViewActivity" />
         <activity android:name=".ClassActivity" />
-        <activity android:name=".NotSignInList"></activity>
     </application>
 
 </manifest>

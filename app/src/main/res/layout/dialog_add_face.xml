@@ -22,7 +22,7 @@
             android:id="@+id/edit_view_faceID"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="如:1420XXXXX"
+            android:hint="(必填)1420XXXXX"
             android:maxLength="10"
             android:singleLine="true" />
     </LinearLayout>
@@ -44,7 +44,7 @@
             android:id="@+id/edit_view_face_name"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="如:张三"
+            android:hint="(必填)张三"
             android:maxLength="10"
             android:singleLine="true" />
     </LinearLayout>

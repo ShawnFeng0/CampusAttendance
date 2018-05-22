@@ -8,12 +8,12 @@ import org.litepal.crud.DataSupport;
 import java.io.ByteArrayOutputStream;
 
 public class Face extends DataSupport{
-    private int id; /* 数据库内部ID */
-    private GroupDB groupDB; /* 数据库表链接到分组表 一组对多个人 */
-    private String faceName; /* 名字 */
-    private String faceID; /* 学号 */
-    private byte[] featureData; /* 人脸特征信息, 根据人脸识别库提取人脸图片得到 */
-    private byte[] faceImageData; /* 人脸图bitmap转换成byte储存 */
+    private int id; //数据库内部储存ID
+    private GroupDB groupDB; //数据库表链接到分组表 一组对多个人
+    private String faceName; //名字
+    private String faceID; //学号
+    private byte[] featureData; //人脸特征信息, 根据人脸识别库提取人脸图片得到
+    private byte[] faceImageData; //人脸图bitmap转换成byte储存
 
     private byte[] getFaceImageData() {
         return faceImageData;
@@ -71,4 +71,11 @@ public class Face extends DataSupport{
         this.setFaceImageData(BitmapHandle.bitmapToByte(faceImage));
     }
 
+    public GroupDB getGroupDB() {
+        return groupDB;
+    }
+
+    public void setGroupDB(GroupDB groupDB) {
+        this.groupDB = groupDB;
+    }
 }
