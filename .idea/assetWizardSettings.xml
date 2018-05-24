@@ -34,7 +34,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="bbdbd7" />
+                                      <entry key="backgroundColor" value="ffffff" />
                                       <entry key="foregroundImage" value="$PROJECT_DIR$/app/src/main/res/drawable-xxhdpi/sign_in_icon.png" />
                                     </map>
                                   </option>
