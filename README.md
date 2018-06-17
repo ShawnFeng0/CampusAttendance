@@ -4,5 +4,3 @@
 ![分组及人脸信息](https://github.com/fs95/CampusAttendance/blob/master/demo1_compression.gif)
 
 ![签到过程](https://github.com/fs95/CampusAttendance/blob/master/demo2_compression.gif)
-
-<iframe height=498 width=510 src='http://player.youku.com/embed/XMzY2OTAwMzIyOA==' frameborder=0 'allowfullscreen'></iframe>
